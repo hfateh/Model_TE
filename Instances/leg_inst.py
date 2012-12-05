@@ -20,7 +20,7 @@ leg = leg.Leg()
 # leg.U_hot = 54.e2
 # leg.U_cold = 253.e3
 
-# R_load = 0.0050
+# R_load = 0.0033
 # leg.R_load = R_load
 # leg.set_constants()
 # leg.set_J()

@@ -44,26 +44,28 @@ class TE_Pair(object):
 
         """
 
-        self.leg_area_ratio = 0.7
+        #self.leg_area_ratio = 0.7
         # Ratio of cross-section area of N-type leg to cross-section
         # area of P-type leg
-        self.fill_fraction = 0.03
+        #self.fill_fraction = 0.03
         # Percentage of nominal area occupied by TE legs.  This is not
         # consistent with the value for the area_void, unless or until
         # set_leg_areas has been called.
-        self.length = 1.e-3
+        #self.length = 1.e-3
         # Length (m) of TE legs
-        self.I = 1.  # electrical current (Amps)
+        #self.I = 1.  # electrical current (Amps)
         self.Ptype = leg.Leg()
         self.Ntype = leg.Leg()
         self.Ptype.material = 'HMS'
         self.Ntype.material = 'MgSi'
-        self.area_void = (1.e-3) ** 2
+        self.area_void = (1.5e-3) ** 2
         # Void area (m^2) associated with each leg pair.  This will be
         # changed when set_leg_areas is called.  After this happens,
         # it will be consisent with self.fill_fraction.
         self.length = 1.e-3
         self.nodes = 10
+        self.Vs = 1.64/256. # guess for Voc
+        self.R_internal = 1.0/256. # guess for R_internal
         #  number of nodes for which the temperature values are
         #  returned by odeint.  This does not affect the actual
         #  calculation, only the values for which results are stored.
@@ -86,7 +88,7 @@ class TE_Pair(object):
         self.Ptype.length = self.length
         self.Ptype.nodes = self.nodes
         self.Ntype.nodes = self.nodes
-        self.Ptype.I = self.I
+        # self.Ptype.I = self.I
         # Current must have same sign as heat flux for p-type
         # material. Heat flux is negative because temperature gradient
         # is positive.

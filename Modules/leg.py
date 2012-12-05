@@ -36,7 +36,7 @@ class Leg(object):
         self.R_load = 1.0
         self.nodes = 10
         self.length = 1.5e-3
-        self.area = (3.e-3) ** 2 
+        self.area = (3.0e-3) ** 2 
         self.set_constants()
         
         self.import_raw_property_data = ( 
@@ -100,6 +100,8 @@ class Leg(object):
         self.Vs = self.Vs_x[0] - self.Vs_x[-1]
         self.V = self.R_load * (self.J * self.area)
         self.R_internal = self.R_int_x[-1]
+
+        # Multiply q_h and q_c by area to get rid of this error
 
         # self.P = self.R_load * (self.J / self.area) ** 2
         self.P = self.V * (self.J * self.area)
