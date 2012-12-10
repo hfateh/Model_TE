@@ -106,21 +106,21 @@ class Leg(object):
         # self.P = self.R_load * (self.J / self.area) ** 2
         self.P = self.V * (self.J * self.area)
 
-        # Sanity check.  q_h - q_c should be nearly equal but not
-        # exactly equal to P.  It is not exact because of spatial
-        # asymmetry in electrical resistivity along the leg.  I
-        # imported assert_approx_equal in the front matter to make
-        # this print an error if there is too much disagreement.
+        # # Sanity check.  q_h - q_c should be nearly equal but not
+        # # exactly equal to P.  It is not exact because of spatial
+        # # asymmetry in electrical resistivity along the leg.  I
+        # # imported assert_approx_equal in the front matter to make
+        # # this print an error if there is too much disagreement.
 
-        self.P_from_heat = (self.q_h - self.q_c) * self.area
+        # self.P_from_heat = (self.q_h - self.q_c) * self.area
 
-        sig_figs = 3
-        try:
-            assert_approx_equal(self.P, self.P_from_heat, sig_figs)
-        except AssertionError:
-            print "\nPower from q_h - q_c and I**2 * R disagree."
-            print "Consider reducing sig_figs under solve_leg_once"
-            print "in leg.py if you think this is an error."
+        # sig_figs = 3
+        # try:
+        #     assert_approx_equal(self.P, self.P_from_heat, sig_figs)
+        # except AssertionError:
+        #     print "\nPower from q_h - q_c and I**2 * R disagree."
+        #     print "Consider reducing sig_figs under solve_leg_once"
+        #     print "in leg.py if you think this is an error."
 
     def get_dTq_dx(self, Tq, x):
 
@@ -144,25 +144,47 @@ class Leg(object):
 
         return dT_dx, dq_dx, dVs_dx, dR_dx
     
+    def set_q_guess(self):
 
-    def solve_leg_for_real(self):
+        """Sets guess for q_c to be used by iterative solutions.
+        """
 
-        self.fsolve_output0 = fsolve(self.get_error_J, x0= self.J)
-        
-    def get_error_J(self, J):
-        
-        print "J in this step is ", self.J
-        self.J = J
-        self.solve_leg()
+        self.T_props = 0.5 * (self.T_h + self.T_c)
+        self.set_TEproperties(T_props=self.T_props)
+        delta_T = self.T_h - self.T_c
 
-        # this is what J needs to be equal to 
-        self.J_correct = (
-            (self.Vs / (self.R_load + self.R_internal)) / self.area
+        self.q_c = - (
+            self.alpha * self.T_c * self.J - delta_T / self.length *
+        self.k - self.J ** 2 * self.length * self.rho
             )
 
-        # the difference between the correct J and calculated J
-        self.J_error = self.J_correct - self.J
+        self.q_h = - (
+            self.alpha * self.T_h * self.J - delta_T / self.length *
+            self.k + self.J ** 2. * self.length * self.rho / 2.
+            )
 
-        return self.J_error
+        self.q_c_guess = self.q_c
+        self.q_h_guess = self.q_h
+        self.q_guess = self.q_h
+
+    # def solve_leg_for_real(self):
+
+    #     self.fsolve_output0 = fsolve(self.get_error_J, x0= self.J)
+        
+    # def get_error_J(self, J):
+        
+    #     print "J in this step is ", self.J
+    #     self.J = J
+    #     self.solve_leg()
+
+    #     # this is what J needs to be equal to 
+    #     self.J_correct = (
+    #         (self.Vs / (self.R_load + self.R_internal)) / self.area
+    #         )
+
+    #     # the difference between the correct J and calculated J
+    #     self.J_error = self.J_correct - self.J
+
+    #     return self.J_error
 
  
