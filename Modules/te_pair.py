@@ -12,7 +12,7 @@ class TE_Pair(object):
         """Sets attributes and instantiates classes.
         """
 
-        self.R_load = 1.0/256.0
+        self.R_load = 4.*1.0/256.0
         self.leg_area_ratio = 0.7
         self.fill_fraction = 0.03
         self.length = 1.e-3
@@ -27,19 +27,13 @@ class TE_Pair(object):
         self.nodes = 10
         self.set_J()
         self.set_constants()
-        
-        print "\n"
-        print "nothing wrong till here1\n"
-        print "\n"
 
     def set_J(self):
 
         """Sets a single J value for a TE pair
         """
         self.J = self.Vs / (self.R_load + self.R_internal)
-
-        print "Initial guess for J is ", self.J
-        print "nothing wrong till here2\n"
+        print "\nGuess for J is", self.J, "\n"
 
     def set_constants(self):
 
@@ -61,19 +55,12 @@ class TE_Pair(object):
         self.Ntype.J = - self.J
         self.Ptype.J = self.J
 
-        print "nothing wrong till here3\n"
-
     def set_q_guess(self):
 
         """Sets cold side guess for both Ntype and Ptype legs.
         """
         self.Ntype.set_q_guess()
         self.Ptype.set_q_guess()
-
-        print "Ntype q_guess is ", self.Ntype.q_guess
-        print "Ptype q_guess is ", self.Ptype.q_guess
-        
-        print "nothing wrong till here4\n"
 
     def set_TEproperties(self, T_props):
 
@@ -89,9 +76,7 @@ class TE_Pair(object):
         self.Ntype.solve_leg_once(self.Ntype.q_h)
         self.Ptype.solve_leg_once(self.Ptype.q_h)
         
-        print "\nSelf.T_c is ", self.Ntype.T_c
         self.T_c = self.Ntype.T_c
-        print "\nSelf.T_c is ", self.T_c
 
         # area averaged hot side heat flux (kW/m^2)
         self.q_h = (
@@ -143,16 +128,13 @@ class TE_Pair(object):
         self.Ntype.T_h = self.T_h_conv
         self.Ptype.T_c = self.T_c_conv
         self.Ntype.T_c = self.T_c_conv
-        
-        print "Ptype.T_h is ", self.Ptype.T_h        
-        print "Ntype.T_h is ", self.Ntype.T_h        
-        print "Ptype.T_c is ", self.Ptype.T_c        
-        print "Ntype.T_c is ", self.Ntype.T_c        
 
         self.set_q_guess()
-        knob_arr0 = np.array([self.Ntype.q_h_guess, self.Ptype.q_h_guess, self.T_h_conv])
+        knob_arr0 = (
+            np.array([self.Ntype.q_h_guess, self.Ptype.q_h_guess,
+        self.T_h_conv])
+            )
 
-        print knob_arr0
         self.Ptype.T_c_goal = None
         self.Ntype.T_c_goal = None
 
