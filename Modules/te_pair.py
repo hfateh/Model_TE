@@ -9,9 +9,7 @@ class TE_Pair(object):
 
     def __init__(self):
 
-        """Sets attributes and instantiates classes.
-        """
-
+        """ """
         self.R_load = 4.*1.0/256.0
         self.leg_area_ratio = 0.7
         self.fill_fraction = 0.03
@@ -30,15 +28,13 @@ class TE_Pair(object):
 
     def set_J(self):
 
-        """Sets a single J value for a TE pair
-        """
+        """ """
         self.J = self.Vs / (self.R_load + self.R_internal)
         print "\nGuess for J is", self.J, "\n"
 
     def set_constants(self):
 
-        """Sets a bunch of attributes that are usually held constant.
-        """
+        """ """
         self.Ntype.length = self.length
         self.Ptype.length = self.length
         self.Ptype.nodes = self.nodes
@@ -47,7 +43,6 @@ class TE_Pair(object):
         self.Ptype.area = self.area
         self.Ntype.set_constants()
         self.Ptype.set_constants()
-        
         self.Ntype.Vs = self.Vs
         self.Ptype.Vs = self.Vs
         self.Ntype.R_internal = self.R_internal
@@ -57,47 +52,36 @@ class TE_Pair(object):
 
     def set_q_guess(self):
 
-        """Sets cold side guess for both Ntype and Ptype legs.
-        """
+        """ """
         self.Ntype.set_q_guess()
         self.Ptype.set_q_guess()
 
     def set_TEproperties(self, T_props):
 
-        """Sets properties for both legs based on temperature.
-        """
+        """ """
         self.Ntype.set_TEproperties(T_props)
         self.Ptype.set_TEproperties(T_props)
 
     def solve_te_pair_once(self):
 
-        """Solves legs and combines results of leg pair.
-        """
+        """ """
         self.Ntype.solve_leg_once(self.Ntype.q_h)
         self.Ptype.solve_leg_once(self.Ptype.q_h)
-        
         self.T_c = self.Ntype.T_c
 
-        # area averaged hot side heat flux (kW/m^2)
         self.q_h = (
             (self.Ptype.q_h * self.Ptype.area + self.Ntype.q_h *
              self.Ntype.area) / self.area * 0.001
             )
-        print "self.q_h is ", self.q_h
 
-        # area averaged cold side heat flux (kW/m^2)
         self.q_c = (
             (self.Ptype.q_c * self.Ptype.area + self.Ntype.q_c *
              self.Ntype.area) / self.area * 0.001
             )
 
-        self.h_eff= self.q_h / (self.T_h - self.T_c)
-        self.R_thermal = 1. / self.h_eff
-
     def get_error(self, knob_arr):
 
-        """Returns BC error.
-        """
+        """ """
         self.Ntype.q_h = knob_arr[0]
         self.Ptype.q_h = knob_arr[1]
         self.T_h = knob_arr[2]
@@ -121,15 +105,14 @@ class TE_Pair(object):
 
     def solve_te_pair(self):
 
-        """Solves legs and combines results of leg pair.
-        """
+        """ """
 
         self.Ptype.T_h = self.T_h_conv 
         self.Ntype.T_h = self.T_h_conv
         self.Ptype.T_c = self.T_c_conv
         self.Ntype.T_c = self.T_c_conv
-
         self.set_q_guess()
+
         knob_arr0 = (
             np.array([self.Ntype.q_h_guess, self.Ptype.q_h_guess,
         self.T_h_conv])
@@ -141,9 +124,6 @@ class TE_Pair(object):
         self.fsolve_output = fsolve(self.get_error, x0=knob_arr0)
 
         self.P = (self.Ntype.P + self.Ptype.P) * 0.001
-        # power for the entire leg pair(kW). Negative sign makes this
-        # a +ve number. Heat flux is negative so efficiency needs
-        # a negative sign also.
         self.P_flux = self.P / self.area
         self.Vs = -self.Ntype.Vs + self.Ptype.Vs
         self.V = self.J * self.R_load / self.area
@@ -162,12 +142,52 @@ class TE_Pair(object):
     #         )
         
     #     self.J_error = self.J_correct - self.J
+    #     print "The error in J is ", self.J_error
     #     return self.J_error
 
     # def solve_te_pair_for_real(self):
-    #     """Solves TE pair iterating through different J values
-    #     """
+    #     """ """
     #     self.fsolve_output0 = fsolve(self.get_J_error, x0= self.J)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     # def set_ZT(self):
 
