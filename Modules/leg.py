@@ -167,24 +167,24 @@ class Leg(object):
         self.q_h_guess = self.q_h
         self.q_guess = self.q_h
 
-    # def solve_leg_for_real(self):
+    def solve_leg_for_real(self):
 
-    #     self.fsolve_output0 = fsolve(self.get_error_J, x0= self.J)
+        self.fsolve_output0 = fsolve(self.get_error_J, x0= self.J)
         
-    # def get_error_J(self, J):
+    def get_error_J(self, J):
         
-    #     print "J in this step is ", self.J
-    #     self.J = J
-    #     self.solve_leg()
+        print "J in this step is ", self.J
+        self.J = J
+        self.solve_leg()
 
-    #     # this is what J needs to be equal to 
-    #     self.J_correct = (
-    #         (self.Vs / (self.R_load + self.R_internal)) / self.area
-    #         )
+        # this is what J needs to be equal to 
+        self.J_correct = (
+            self.Vs / (self.R_load + self.R_internal)
+            )
 
-    #     # the difference between the correct J and calculated J
-    #     self.J_error = self.J_correct - self.J
+        # the difference between the correct J and calculated J
+        self.J_error = self.J_correct - self.J
 
-    #     return self.J_error
+        return self.J_error
 
  

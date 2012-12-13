@@ -10,12 +10,12 @@ class TE_Pair(object):
     def __init__(self):
 
         """ """
-        self.R_load = 4.*1.0/256.0
+        self.R_load = 1.0/256.0
         self.leg_area_ratio = 0.7
         self.fill_fraction = 0.03
         self.length = 1.e-3
         self.area = (1.5e-3) ** 2
-        self.Vs = 50* 1.64/256. # initial guess for Voc
+        self.Vs = 1.64/256. # initial guess for Voc
         self.R_internal = 1./256. # initial guess for R_internal
 
         self.Ptype = leg.Leg()
@@ -29,7 +29,7 @@ class TE_Pair(object):
     def set_J(self):
 
         """ """
-        self.J = self.Vs / (self.R_load + self.R_internal)
+        self.J = self.Vs / self.R_load
         print "\nGuess for J is", self.J, "\n"
 
     def set_constants(self):
@@ -130,16 +130,14 @@ class TE_Pair(object):
         self.R_internal = ( 
             self.Ntype.R_internal + self.Ptype.R_internal
             )
-        print "Read this \n"
 
     def get_J_error(self, J):
         """Return the error in actual and guessed J value
         """
         self.solve_te_pair()
-        
+
         self.J_correct = (
-            self.Vs / (self.R_load + self.Ntype.R_internal +
-            self.Ptype.R_internal)
+            self.Vs / self.R_load
             )
 
         self.J_error = self.J_correct - self.J
