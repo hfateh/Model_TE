@@ -15,7 +15,7 @@ class TE_Pair(object):
         self.fill_fraction = 0.03
         self.length = 1.e-3
         self.area = (1.5e-3) ** 2
-        self.Vs = 1.64/256. # initial guess for Voc
+        self.Vs = 50* 1.64/256. # initial guess for Voc
         self.R_internal = 1./256. # initial guess for R_internal
 
         self.Ptype = leg.Leg()
@@ -130,233 +130,23 @@ class TE_Pair(object):
         self.R_internal = ( 
             self.Ntype.R_internal + self.Ptype.R_internal
             )
+        print "Read this \n"
 
-    # def get_J_error(self, J):
-    #     """Return the error in actual and guessed J value
-    #     """
-    #     self.solve_te_pair()
+    def get_J_error(self, J):
+        """Return the error in actual and guessed J value
+        """
+        self.solve_te_pair()
         
-    #     self.J_correct = (
-    #         self.Vs / (self.R_load + self.Ntype.R_internal +
-    #         self.Ptype.R_internal)
-    #         )
-        
-    #     self.J_error = self.J_correct - self.J
-    #     print "The error in J is ", self.J_error
-    #     return self.J_error
-
-    # def solve_te_pair_for_real(self):
-    #     """ """
-    #     self.fsolve_output0 = fsolve(self.get_J_error, x0= self.J)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    # def set_ZT(self):
-
-    #     """Sets ZT based on whatever properties were used last."""
-
-    #     self.ZT = ( ((self.Ptype.alpha - self.Ntype.alpha) /
-    #     ((self.Ptype.rho * self.Ptype.k) ** 0.5 + (self.Ntype.rho *
-    #     self.Ntype.k) ** 0.5)) ** 2. * self.T_props )
-
-    # def set_eta_max(self):
-
-    #     """Sets theoretical maximum efficiency.
-
-    #     Methods:
-
-    #     self.set_TEproperties(T_props)
-
-    #     Uses material properties evaluated at the average temperature
-    #     based on Sherman's analysis.
-
-    #     """
-
-    #     self.T_props = 0.5 * (self.T_h + self.T_c)
-    #     self.set_TEproperties(T_props=self.T_props)
-    #     self.set_ZT()
-    #     delta_T = self.T_h - self.T_c
-    #     self.eta_max = ( delta_T / self.T_h * ((1. + self.ZT) ** 0.5 -
-    #     1.) / ((1. + self.ZT) ** 0.5 + self.T_c / self.T_h) )
-
-    # def set_A_opt(self):
-
-    #     """Sets Ntype / Ptype area that results in max efficiency.
-
-    #     Methods:
-
-    #     self.set_TEproperties(T_props)
-
-    #     Based on material properties evaluated at the average
-    #     temperature.
-
-    #     """
-
-    #     self.set_TEproperties(T_props=self.T_props)
-    #     self.A_opt = np.sqrt(self.Ntype.rho * self.Ptype.k /
-    #     (self.Ptype.rho * self.Ntype.k))
-
-    # def set_power_max(self):
-
-    #     """Sets power factor and maximum theoretical power.
-
-    #     Methods:
-
-    #     self.Ntype.set_power_factor
-    #     self.Ptype.set_power_factor
-
-    #     """
-
-    #     self.Ntype.set_power_factor()
-    #     self.Ptype.set_power_factor()
-    #     self.power_max = self.Ntype.power_max + self.Ptype.power_max
-
-    # def set_leg_areas(self):
-
-    #     """Sets leg areas and void area.
-
-    #     Based on leg area ratio and fill fraction.
-
-    #     self.Ptype.area must be held constant.  self.Ntype.area and
-    #     self.area_void are varied here.
-
-    #     """
-
-    #     leg_area_ratio = self.leg_area_ratio
-    #     fill_fraction = self.fill_fraction
-
-    #     self.Ntype.area = self.Ptype.area * leg_area_ratio
-    #     self.area_void = (
-    #         (1. - fill_fraction) / fill_fraction * (self.Ptype.area +
-    #     self.Ntype.area)
-    #         )
-    #     self.area = self.Ntype.area + self.Ptype.area + self.area_void
-        
-    # def get_minpar(self, apar):
-
-    #     """Returns inverse of power flux.
-
-    #     Methods:
-
-    #     self.set_leg_areas
-
-    #     Used by method self.optimize
-
-    #     self.length = apar[0]
-    #     self.fill_fraction = apar[1]
-    #     self.I = apar[2]
-    #     self.leg_area_ratio = apar[3]
-
-    #     Use with scipy.optimize.fmin to find optimal set of input
-    #     parameters.
-
-    #     This method uses power flux rather than power because for
-    #     optimal power, leg height approaches zero and void area
-    #     approaches infinity.  This trivial result is not useful."""
-
-    #     self.opt_iter = self.opt_iter + 1
-    #     if self.opt_iter % 15 == 0:
-    #         print "\noptimizaton iteration", self.opt_iter
-    #         print "leg length =", self.length, "m"
-    #         print "fill fraction =", self.fill_fraction * 100., "%"
-    #         print "current =", self.I, "A"
-    #         print "area ratio =", self.leg_area_ratio
-    #         print "power flux (kW/m^2)", self.P_flux
-    #     apar = np.array(apar)
-
-    #     self.length = apar[0]
-    #     self.fill_fraction = apar[1]
-    #     self.I = apar[2]
-    #     self.leg_area_ratio = apar[3]
-
-    #     # reset surrogate variables
-    #     self.set_constants()
-
-    #     self.solve_te_pair()
-
-    #     if (apar <= 0.).any():
-    #         minpar = np.abs(self.P_flux) ** 3. + 100
-    #         print "Encountered impossible value."
-
-    #     else:
-    #         minpar = - self.P_flux
-
-    #     return minpar
-
-    # def optimize(self):
-
-    #     """Minimizes self.get_minpar
-
-    #     Methods:
-
-    #     self.get_minpar
-
-    #     self.x0 and self.xb must be defined elsewhere."""
-
-    #     time.clock()
-
-    #     # dummy function that might be used with minimization
-    #     def fprime():
-    #         return 1
-
-    #     self.opt_iter = 0
-
-    #     self.x0 = np.array([self.length, self.fill_fraction,
-    #     self.I, self.leg_area_ratio])
-
-    #     from scipy.optimize import fmin
-
-    #     self.xmin = fmin(self.get_minpar, self.x0)
-
-    #     t1 = time.clock()
-
-    #     print '\n'
-
-    #     print "Optimized parameters:"
-    #     print "leg length =", self.length, "m"
-    #     print "fill fraction =", self.fill_fraction * 100., "%"
-    #     print "current =", self.I, "A"
-    #     print "area ratio =", self.leg_area_ratio
-
-    #     print "\npower:", self.P * 1000., 'W'
-    #     print "power flux:", self.P_flux, "kW/m^2"
-
-    #     print """Elapsed time solving xmin1 =""", t1
+        self.J_correct = (
+            self.Vs / (self.R_load + self.Ntype.R_internal +
+            self.Ptype.R_internal)
+            )
+
+        self.J_error = self.J_correct - self.J
+        print "Seebeck voltage is ", self.Vs
+        print "The error in J is ", self.J_error
+        return self.J_error
+
+    def solve_te_pair_for_real(self):
+        """ """
+        self.fsolve_output0 = fsolve(self.get_J_error, x0= self.J)

@@ -23,10 +23,10 @@ te_pair.U_hot = 20000.
 
 te_pair.solve_te_pair_for_real()
 
-print "\nLoad resistance is ", te_pair.R_load
-print "\nNtype T distribution is \n", te_pair.Ntype.T_x
-print "\nPtype T distribution is \n", te_pair.Ptype.T_x
+# print "\nLoad resistance is ", te_pair.R_load
+# print "\nNtype T distribution is \n", te_pair.Ntype.T_x
+# print "\nPtype T distribution is \n", te_pair.Ptype.T_x
 
-print "\nte_pair q_h is ", te_pair.q_h
-print "\nte_pair q_c is ", te_pair.q_c
-print "\nPower output for te_pair is ", te_pair.P
+# print "\nte_pair q_h is ", te_pair.q_h
+# print "\nte_pair q_c is ", te_pair.q_c
+# print "\nPower output for te_pair is ", te_pair.P
