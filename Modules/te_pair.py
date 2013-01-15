@@ -43,8 +43,8 @@ class TE_Pair(object):
         self.Ptype.area = self.area
         self.Ntype.set_constants()
         self.Ptype.set_constants()
-        self.Ntype.Vs = self.Vs
-        self.Ptype.Vs = self.Vs
+        #self.Ntype.Vs = self.Vs
+        #self.Ptype.Vs = self.Vs
         self.Ntype.R_internal = self.R_internal
         self.Ptype.R_internal = self.R_internal
         self.Ntype.J = - self.J
@@ -137,9 +137,9 @@ class TE_Pair(object):
         self.solve_te_pair()
 
         self.J_correct = (
-            self.Vs / self.R_load
+            self.Vs / (self.R_load + self.R_internal)
             )
-
+        
         self.J_error = self.J_correct - self.J
         print "Seebeck voltage is ", self.Vs
         print "The error in J is ", self.J_error
@@ -148,3 +148,4 @@ class TE_Pair(object):
     def solve_te_pair_for_real(self):
         """ """
         self.fsolve_output0 = fsolve(self.get_J_error, x0= self.J)
+
