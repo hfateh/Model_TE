@@ -23,7 +23,33 @@ te_pair.T_h_conv = 800.
 te_pair.U_cold = 800000.
 te_pair.U_hot = 20000.
 
+te_pair.R_load = 0.0035
 te_pair.solve_te_pair()
+print "\nPower is ", te_pair.P
+
+te_pair.R_load = 0.0035
+te_pair.solve_te_pair()
+print "\nPower is ", te_pair.P
+
+# te_pair.R_load = 0.0035
+# te_pair.solve_te_pair()
+# print "\nPower is ", te_pair.P
+
+# te_pair.R_load = 0.0035
+# te_pair.solve_te_pair()
+# print "\nPower is ", te_pair.P
+
+
+
+
+
+
+
+
+# print "Ntype V is ", te_pair.Ntype.V
+# print "Ntype J is ", te_pair.Ntype.J
+# print "Ptype V is ", te_pair.Ptype.V
+# print "Ptype J is ", te_pair.Ptype.J
 
 
 
@@ -34,9 +60,7 @@ te_pair.solve_te_pair()
 
 
 
-
-
-# R_load = np.linspace(0.001, 0.007, 12)
+# R_load = np.linspace(0.0001, 0.0005, 5)
 # R_internal = np.zeros(R_load.size)
 # P = np.zeros(R_load.size)
 # for i in range(R_load.size):

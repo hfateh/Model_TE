@@ -1,5 +1,6 @@
 import numpy as np
 from scipy.optimize import fsolve
+
 import leg
 reload(leg)
 
@@ -16,7 +17,8 @@ class TE_Pair(object):
         self.fill_fraction = 0.3
         self.Vs = 1.64/256.         # initial guess for Voc
         self.R_internal = 1./256.   # initial guess for R_internal
-
+        self.Vs = 1.64/256.
+        
         self.Ptype = leg.Leg()
         self.Ntype = leg.Leg()
 
@@ -24,13 +26,15 @@ class TE_Pair(object):
         self.Ntype.material = 'MgSi'
 
         self.nodes = 10
-        self.set_J()
         self.set_constants()
 
     def set_J(self):
 
         """ """
         self.J = self.Vs / (self.R_load + self.R_internal)
+        self.Ntype.J = -self.J
+        self.Ptype.J = self.J
+        print "Guess for J is ", self.J
 
     def set_leg_areas(self):
         """ """
@@ -53,10 +57,10 @@ class TE_Pair(object):
         self.Ntype.nodes = self.nodes
         self.Ntype.set_constants()
         self.Ptype.set_constants()
+        self.Ntype.Vs = -self.Vs
+        self.Ptype.Vs = self.Vs
         self.Ntype.R_internal = self.R_internal
         self.Ptype.R_internal = self.R_internal
-        self.Ntype.J = - self.J
-        self.Ptype.J = self.J
 
     def set_q_guess(self):
 
@@ -88,6 +92,12 @@ class TE_Pair(object):
              self.Ntype.area) / self.area * 0.001
             )
 
+        self.Vs = -self.Ntype.Vs + self.Ptype.Vs
+
+        self.R_internal = ( 
+            self.Ntype.R_internal + self.Ptype.R_internal
+            )
+
     def get_error(self, knob_arr):
 
         """ """
@@ -103,7 +113,8 @@ class TE_Pair(object):
 
         self.q_c_conv = self.U_cold * (self.T_c - self.T_c_conv)
         self.q_h_conv = self.U_hot * (self.T_h_conv - self.T_h)
-
+        # print "J in this run is ", self.J
+        
         self.J_correct = (
             self.Vs / (self.R_load + self.R_internal)
             )
@@ -112,11 +123,9 @@ class TE_Pair(object):
         q_c_error = self.q_c - self.q_c_conv
         q_h_error = self.q_h - self.q_h_conv
         J_error = self.J_correct - self.J
-
-        # print "Error in T_c is", T_c_error
-        # print "Error in q_c is", q_c_error
-        # print "Error in q_h is", q_h_error
-        # print "Error in J is", J_error
+        #print "\nJ_correct is ", self.J_correct
+        #print "J_guess is ", self.J
+        #print "J_error is ", J_error
 
         self.error = (
             np.array([T_c_error, q_c_error, q_h_error, J_error]).flatten()
@@ -131,6 +140,7 @@ class TE_Pair(object):
         self.Ntype.T_h = self.T_h_conv
         self.Ptype.T_c = self.T_c_conv
         self.Ntype.T_c = self.T_c_conv
+        self.set_J()
         self.set_q_guess()
 
         knob_arr0 = (
@@ -138,18 +148,42 @@ class TE_Pair(object):
         self.T_h_conv, self.J])
             )
 
-        self.Ptype.T_c_goal = None
-        self.Ntype.T_c_goal = None
+        # self.Ptype.T_c_goal = None
+        # self.Ntype.T_c_goal = None
 
         self.fsolve_output = fsolve(self.get_error, x0=knob_arr0)
 
         self.P = (self.Ntype.P + self.Ptype.P) * 0.001
-        self.P_flux = self.P / self.area
-        self.Vs = -self.Ntype.Vs + self.Ptype.Vs
-        self.V = self.J * self.R_load / self.area
-        self.R_internal = ( 
-            self.Ntype.R_internal + self.Ptype.R_internal
-            )
+        # self.Vs = -self.Ntype.Vs + self.Ptype.Vs
+        # self.V = self.J * self.R_load * self.area
+        # self.R_internal = ( 
+        #     self.Ntype.R_internal + self.Ptype.R_internal
+        #     )
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
     # Now we don't need this following technique since I have already

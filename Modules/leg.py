@@ -167,6 +167,20 @@ class Leg(object):
         self.q_h_guess = self.q_h
         self.q_guess = self.q_h
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     def solve_leg_for_real(self):
 
         self.fsolve_output0 = fsolve(self.get_error_J, x0= self.J)
