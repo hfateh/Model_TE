@@ -85,6 +85,7 @@ class TE_Pair(object):
         self.Ntype.q_h = knob_arr[0]
         self.Ptype.q_h = knob_arr[1]
         self.T_h = knob_arr[2]
+        self.J = knob_arr[3]
 
         self.Ptype.T_h = self.T_h
         self.Ntype.T_h = self.T_h
@@ -94,12 +95,22 @@ class TE_Pair(object):
         self.q_c_conv = self.U_cold * (self.T_c - self.T_c_conv)
         self.q_h_conv = self.U_hot * (self.T_h_conv - self.T_h)
 
+        self.J_correct = (
+            self.Vs / (self.R_load + self.R_internal)
+            )
+
         T_c_error = self.Ntype.T_c - self.Ptype.T_c
         q_c_error = self.q_c - self.q_c_conv
         q_h_error = self.q_h - self.q_h_conv
+        J_error = self.J_correct - self.J
+
+        print "Error in T_c is", T_c_error
+        print "Error in q_c is", q_c_error
+        print "Error in q_h is", q_h_error
+        print "Error in J is", J_error
 
         self.error = (
-            np.array([T_c_error, q_c_error, q_h_error]).flatten()
+            np.array([T_c_error, q_c_error, q_h_error, J_error]).flatten()
             )
         return self.error
 
@@ -115,7 +126,7 @@ class TE_Pair(object):
 
         knob_arr0 = (
             np.array([self.Ntype.q_h_guess, self.Ptype.q_h_guess,
-        self.T_h_conv])
+        self.T_h_conv, self.J])
             )
 
         self.Ptype.T_c_goal = None
@@ -131,21 +142,24 @@ class TE_Pair(object):
             self.Ntype.R_internal + self.Ptype.R_internal
             )
 
-    def get_J_error(self, J):
-        """Return the error in actual and guessed J value
-        """
-        self.solve_te_pair()
-
-        self.J_correct = (
-            self.Vs / (self.R_load + self.R_internal)
-            )
+    # def get_J_error(self, J):
+    #     """Return the error in actual and guessed J value
+    #     """
+    #     # print "New Guess for J is", self.J
+    #     # print "Internal resistance is ", self.R_internal
         
-        self.J_error = self.J_correct - self.J
-        print "Seebeck voltage is ", self.Vs
-        print "The error in J is ", self.J_error
-        return self.J_error
+    #     self.solve_te_pair()
+        
+    #     self.J_correct = (
+    #         self.Vs / (self.R_load + self.R_internal)
+    #         )
+        
+    #     self.J_error = self.J_correct - self.J
+    #     print "Seebeck voltage is ", self.Vs
+    #     print "The error in J is ", self.J_error
+    #     return self.J_error
 
-    def solve_te_pair_for_real(self):
-        """ """
-        self.fsolve_output0 = fsolve(self.get_J_error, x0= self.J)
+    # def solve_te_pair_for_real(self):
+    #     """ """
+    #     self.fsolve_output0 = fsolve(self.get_J_error, x0= self.J)
 
