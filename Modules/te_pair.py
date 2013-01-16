@@ -11,17 +11,18 @@ class TE_Pair(object):
 
         """ """
         self.R_load = 1.0/256.0
-        self.leg_area_ratio = 0.7
-        self.fill_fraction = 0.03
         self.length = 1.e-3
-        self.area = (1.5e-3) ** 2
-        self.Vs = 1.64/256. # initial guess for Voc
-        self.R_internal = 1./256. # initial guess for R_internal
+        self.leg_area_ratio = 0.8
+        self.fill_fraction = 0.3
+        self.Vs = 1.64/256.         # initial guess for Voc
+        self.R_internal = 1./256.   # initial guess for R_internal
 
         self.Ptype = leg.Leg()
         self.Ntype = leg.Leg()
+
         self.Ptype.material = 'HMS'
         self.Ntype.material = 'MgSi'
+
         self.nodes = 10
         self.set_J()
         self.set_constants()
@@ -29,22 +30,29 @@ class TE_Pair(object):
     def set_J(self):
 
         """ """
-        self.J = self.Vs / self.R_load
-        print "\nGuess for J is", self.J, "\n"
+        self.J = self.Vs / (self.R_load + self.R_internal)
+
+    def set_leg_areas(self):
+        """ """
+        self.Ntype.area = self.Ptype.area * self.leg_area_ratio
+        self.area_void = (
+            ((1.- self.fill_fraction) * (self.Ntype.area +
+        self.Ptype.area)) / (self.fill_fraction)
+            )
+        self.area = (
+            self.Ntype.area + self.Ptype.area + self.area_void
+            )
 
     def set_constants(self):
 
         """ """
+        self.set_leg_areas()
         self.Ntype.length = self.length
         self.Ptype.length = self.length
         self.Ptype.nodes = self.nodes
         self.Ntype.nodes = self.nodes
-        self.Ntype.area = self.area
-        self.Ptype.area = self.area
         self.Ntype.set_constants()
         self.Ptype.set_constants()
-        #self.Ntype.Vs = self.Vs
-        #self.Ptype.Vs = self.Vs
         self.Ntype.R_internal = self.R_internal
         self.Ptype.R_internal = self.R_internal
         self.Ntype.J = - self.J
@@ -56,11 +64,12 @@ class TE_Pair(object):
         self.Ntype.set_q_guess()
         self.Ptype.set_q_guess()
 
-    def set_TEproperties(self, T_props):
+    # I dont know why this is here, its unnecessary, delete this
+    # def set_TEproperties(self, T_props):
 
-        """ """
-        self.Ntype.set_TEproperties(T_props)
-        self.Ptype.set_TEproperties(T_props)
+    #     """ """
+    #     self.Ntype.set_TEproperties(T_props)
+    #     self.Ptype.set_TEproperties(T_props)
 
     def solve_te_pair_once(self):
 
@@ -141,6 +150,11 @@ class TE_Pair(object):
         self.R_internal = ( 
             self.Ntype.R_internal + self.Ptype.R_internal
             )
+
+
+    # Now we don't need this following technique since I have already
+    # included the J_error inside fsolve
+
 
     # def get_J_error(self, J):
     #     """Return the error in actual and guessed J value

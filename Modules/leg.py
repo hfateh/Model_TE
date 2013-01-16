@@ -127,7 +127,7 @@ class Leg(object):
         #print "Tq array inside dTq_dx is \n", Tq
         T = Tq[0]
         q = Tq[1]
-
+        
         self.set_TEproperties(T)
         self.set_ZT()
         self.I = self.J * self.area
