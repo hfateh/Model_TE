@@ -113,10 +113,10 @@ class TE_Pair(object):
         q_h_error = self.q_h - self.q_h_conv
         J_error = self.J_correct - self.J
 
-        print "Error in T_c is", T_c_error
-        print "Error in q_c is", q_c_error
-        print "Error in q_h is", q_h_error
-        print "Error in J is", J_error
+        # print "Error in T_c is", T_c_error
+        # print "Error in q_c is", q_c_error
+        # print "Error in q_h is", q_h_error
+        # print "Error in J is", J_error
 
         self.error = (
             np.array([T_c_error, q_c_error, q_h_error, J_error]).flatten()
