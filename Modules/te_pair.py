@@ -28,13 +28,13 @@ class TE_Pair(object):
         self.nodes = 10
         self.set_constants()
 
-    def set_J(self):
+    def set_I(self):
 
         """ """
         self.I = self.Vs / (self.R_load + self.R_internal)
         self.set_leg_areas()
-        self.Ntype.J = -self.I/self.Ntype.area
-        self.Ptype.J = self.I/self.Ptype.area
+        self.Ntype.I = -self.I
+        self.Ptype.I = self.I
 
     def set_leg_areas(self):
         """ """
@@ -112,22 +112,26 @@ class TE_Pair(object):
 
         self.q_c_conv = self.U_cold * (self.T_c - self.T_c_conv)
         self.q_h_conv = self.U_hot * (self.T_h_conv - self.T_h)
-        print "J in this run is ", self.J
+        #print "I in this run is ", self.I
         
-        self.J_correct = (
+        self.I_correct = (
             self.Vs / (self.R_load + self.R_internal)
             )
 
         T_c_error = self.Ntype.T_c - self.Ptype.T_c
         q_c_error = self.q_c - self.q_c_conv
         q_h_error = self.q_h - self.q_h_conv
-        J_error = self.I_correct - self.I
-        #print "\nJ_correct is ", self.J_correct
-        #print "J_guess is ", self.J
-        #print "J_error is ", J_error
+        I_error = self.I_correct - self.I
+        print "\n"
+        print "\n"
+        print "\nI_correct is ", self.I_correct
+        print "I_guess is ", self.I
+        print "I_error is ", I_error
+        print "\n"
+        print "\n"
 
         self.error = (
-            np.array([T_c_error, q_c_error, q_h_error, J_error]).flatten()
+            np.array([T_c_error, q_c_error, q_h_error, I_error]).flatten()
             )
         return self.error
 
@@ -139,25 +143,21 @@ class TE_Pair(object):
         self.Ntype.T_h = self.T_h_conv
         self.Ptype.T_c = self.T_c_conv
         self.Ntype.T_c = self.T_c_conv
-        self.set_J()
+        self.set_I()
         self.set_q_guess()
 
         knob_arr0 = (
             np.array([self.Ntype.q_h_guess, self.Ptype.q_h_guess,
-        self.T_h_conv, self.J])
+        self.T_h_conv, self.I])
             )
 
         # self.Ptype.T_c_goal = None
         # self.Ntype.T_c_goal = None
 
         self.fsolve_output = fsolve(self.get_error, x0=knob_arr0)
+        self.V = self.I * self.R_load
+        self.P = self.I * self.V
 
-        self.P = (self.Ntype.P + self.Ptype.P) * 0.001
-        # self.Vs = -self.Ntype.Vs + self.Ptype.Vs
-        # self.V = self.J * self.R_load * self.area
-        # self.R_internal = ( 
-        #     self.Ntype.R_internal + self.Ptype.R_internal
-        #     )
 
 
 

@@ -23,42 +23,44 @@ te_pair.T_h_conv = 800.
 te_pair.U_cold = 800000.
 te_pair.U_hot = 20000.
 
-te_pair.solve_te_pair()
+# te_pair.solve_te_pair()
 
-# R_load = np.linspace(0.0001, 0.0005, 2)
-# R_internal = np.zeros(R_load.size)
-# P = np.zeros(R_load.size)
-# for i in range(R_load.size):
-#     te_pair.R_load = R_load[i]
-#     te_pair.solve_te_pair()
-#     #print "Actual J is ", te_pair.J
-#     P[i] = te_pair.P
-#     print "Power is ", P[i]
-#     R_internal[i] = te_pair.R_internal
 
-# # Plot configuration
-# FONTSIZE = 14
-# plt.rcParams['axes.labelsize'] = FONTSIZE
-# plt.rcParams['axes.titlesize'] = FONTSIZE
-# plt.rcParams['legend.fontsize'] = FONTSIZE
-# plt.rcParams['xtick.labelsize'] = FONTSIZE
-# plt.rcParams['ytick.labelsize'] = FONTSIZE
-# plt.rcParams['lines.linewidth'] = 1.5
-# plt.rcParams['lines.markersize'] = 10
 
-# plt.close()
+R_load = np.linspace(0.001, 0.03, 30)
+R_internal = np.zeros(R_load.size)
+P = np.zeros(R_load.size)
+for i in range(R_load.size):
+    te_pair.R_load = R_load[i]
+    te_pair.solve_te_pair()
+    #print "Actual J is ", te_pair.J
+    P[i] = te_pair.P
+    print "Power is ", P[i]
+    R_internal[i] = te_pair.R_internal
 
-# plt.figure()
+# Plot configuration
+FONTSIZE = 14
+plt.rcParams['axes.labelsize'] = FONTSIZE
+plt.rcParams['axes.titlesize'] = FONTSIZE
+plt.rcParams['legend.fontsize'] = FONTSIZE
+plt.rcParams['xtick.labelsize'] = FONTSIZE
+plt.rcParams['ytick.labelsize'] = FONTSIZE
+plt.rcParams['lines.linewidth'] = 1.5
+plt.rcParams['lines.markersize'] = 10
 
-# plt.plot(R_load, P, 's')
-# # plt.plot(R_load, R_internal, 'o')
-# plt.grid()
-# plt.xlabel('R_load (ohms)')
-# plt.ylabel('Power (W)')
-# #plt.ylim(0,0)
-# #plt.xlim(0,0)
+plt.close()
 
-# plt.show()
+plt.figure()
+
+plt.plot(R_load, P, 's')
+# plt.plot(R_load, R_internal, 'o')
+plt.grid()
+plt.xlabel('R_load (ohms)')
+plt.ylabel('Power (W)')
+#plt.ylim(0,0)
+#plt.xlim(0,0)
+
+plt.show()
 
 
 
