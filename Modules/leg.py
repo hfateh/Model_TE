@@ -55,15 +55,13 @@ class Leg(object):
             self.alpha ** 2. * self.T_props / (self.k * self. rho)
             )
 
-    def set_J(self):
+    def set_I(self):
 
-        self.J = (
-            (self.Vs) / ((self.area) * (self.R_load +
-            self.R_internal))
-            )
+        self.I = self.Vs / (self.R_load + self.R_internal)
 
     def set_constants(self):
 
+        self.set_I()
         self.x = np.linspace(0., self.length, self.nodes)
 
     def solve_leg(self):
@@ -101,13 +99,13 @@ class Leg(object):
         self.q_c = self.q_x[-1]
         
         self.Vs = self.Vs_x[0] - self.Vs_x[-1]
-        self.V = self.R_load * (self.J * self.area)
+        self.V = self.R_load * self.I
         self.R_internal = self.R_int_x[-1]
 
         # Multiply q_h and q_c by area to get rid of this error
 
-        # self.P = self.R_load * (self.J / self.area) ** 2
-        self.P = self.V * (self.J * self.area)
+        # self.P = self.R_load * self.I ** 2
+        self.P = self.I * self.V
 
         # # Sanity check.  q_h - q_c should be nearly equal but not
         # # exactly equal to P.  It is not exact because of spatial
@@ -133,14 +131,14 @@ class Leg(object):
         
         self.set_TEproperties(T)
         self.set_ZT()
-        self.I = self.J * self.area
+        J = self.I / self.area
 
         dT_dx = (
-            (self.J * self.alpha * T - q) / self.k
+            (J * self.alpha * T - q) / self.k
             )
         dq_dx = (
-            (self.rho * self.J ** 2. * (1+self.ZT)) - (self.J *
-            self.alpha * q / self.k)
+            (self.rho * J ** 2. * (1+self.ZT)) - (J * self.alpha * q /
+            self.k)
             )
         dVs_dx = (self.alpha * dT_dx)
         dR_dx = (self.rho / self.area)
@@ -155,15 +153,16 @@ class Leg(object):
         self.T_props = 0.5 * (self.T_h + self.T_c)
         self.set_TEproperties(T_props=self.T_props)
         delta_T = self.T_h - self.T_c
+        J = self.I / self.area
 
         self.q_c = - (
-            self.alpha * self.T_c * self.J - delta_T / self.length *
-        self.k - self.J ** 2 * self.length * self.rho
+            self.alpha * self.T_c * J - delta_T / self.length *
+        self.k - J ** 2 * self.length * self.rho
             )
 
         self.q_h = - (
-            self.alpha * self.T_h * self.J - delta_T / self.length *
-            self.k + self.J ** 2. * self.length * self.rho / 2.
+            self.alpha * self.T_h * J - delta_T / self.length *
+            self.k + J ** 2. * self.length * self.rho / 2.
             )
 
         self.q_c_guess = self.q_c
@@ -184,25 +183,27 @@ class Leg(object):
 
 
 
+
+
+
     def solve_leg_for_real(self):
 
-        self.fsolve_output0 = fsolve(self.get_error_J, x0= self.J)
+        self.fsolve_output0 = fsolve(self.get_error_I, x0= self.I)
+        print "Final I is ", self.I
         
-    def get_error_J(self, J):
+    def get_error_I(self, I):
         
-        print "J in this step is ", self.J
-        self.J = J
+        self.I = I
         self.solve_leg()
+        print "I in this step is ", self.I
 
-        # this is what J needs to be equal to 
-        self.J_correct = (
-            (self.Vs) / ((self.area) * (self.R_load +
-            self.R_internal))
-            )
+        # this is what I needs to be equal to 
+        self.I_correct = self.Vs / (self.R_load + self.R_internal)
 
         # the difference between the correct J and calculated J
-        self.J_error = self.J_correct - self.J
+        self.I_error = self.I_correct - self.I
 
-        return self.J_error
+        print "Error in I is ", self.I_error
+        return self.I_error
 
  
