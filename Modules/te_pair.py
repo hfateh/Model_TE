@@ -34,7 +34,7 @@ class TE_Pair(object):
         self.J = self.Vs / (self.R_load + self.R_internal)
         self.Ntype.J = -self.J
         self.Ptype.J = self.J
-        print "Guess for J is ", self.J
+        print "\nGuess for J is ", self.J
 
     def set_leg_areas(self):
         """ """

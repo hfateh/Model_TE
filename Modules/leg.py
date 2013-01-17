@@ -49,10 +49,6 @@ class Leg(object):
             types.MethodType(mat_prop.set_TEproperties, self)
             )
 
-    def set_constants(self):
-
-        self.x = np.linspace(0., self.length, self.nodes)
-
     def set_ZT(self):
 
         self.ZT = (
@@ -61,7 +57,14 @@ class Leg(object):
 
     def set_J(self):
 
-        self.J = self.Vs / (self.R_load + self.R_internal)
+        self.J = (
+            (self.Vs) / ((self.area) * (self.R_load +
+            self.R_internal))
+            )
+
+    def set_constants(self):
+
+        self.x = np.linspace(0., self.length, self.nodes)
 
     def solve_leg(self):
         
@@ -193,7 +196,8 @@ class Leg(object):
 
         # this is what J needs to be equal to 
         self.J_correct = (
-            self.Vs / (self.R_load + self.R_internal)
+            (self.Vs) / ((self.area) * (self.R_load +
+            self.R_internal))
             )
 
         # the difference between the correct J and calculated J
