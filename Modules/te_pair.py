@@ -31,10 +31,10 @@ class TE_Pair(object):
     def set_J(self):
 
         """ """
-        self.J = self.Vs / (self.R_load + self.R_internal)
-        self.Ntype.J = -self.J
-        self.Ptype.J = self.J
-        print "\nGuess for J is ", self.J
+        self.I = self.Vs / (self.R_load + self.R_internal)
+        self.set_leg_areas()
+        self.Ntype.J = -self.I/self.Ntype.area
+        self.Ptype.J = self.I/self.Ptype.area
 
     def set_leg_areas(self):
         """ """
@@ -50,7 +50,6 @@ class TE_Pair(object):
     def set_constants(self):
 
         """ """
-        self.set_leg_areas()
         self.Ntype.length = self.length
         self.Ptype.length = self.length
         self.Ptype.nodes = self.nodes
@@ -104,7 +103,7 @@ class TE_Pair(object):
         self.Ntype.q_h = knob_arr[0]
         self.Ptype.q_h = knob_arr[1]
         self.T_h = knob_arr[2]
-        self.J = knob_arr[3]
+        self.I = knob_arr[3]
 
         self.Ptype.T_h = self.T_h
         self.Ntype.T_h = self.T_h
@@ -113,7 +112,7 @@ class TE_Pair(object):
 
         self.q_c_conv = self.U_cold * (self.T_c - self.T_c_conv)
         self.q_h_conv = self.U_hot * (self.T_h_conv - self.T_h)
-        # print "J in this run is ", self.J
+        print "J in this run is ", self.J
         
         self.J_correct = (
             self.Vs / (self.R_load + self.R_internal)
@@ -122,7 +121,7 @@ class TE_Pair(object):
         T_c_error = self.Ntype.T_c - self.Ptype.T_c
         q_c_error = self.q_c - self.q_c_conv
         q_h_error = self.q_h - self.q_h_conv
-        J_error = self.J_correct - self.J
+        J_error = self.I_correct - self.I
         #print "\nJ_correct is ", self.J_correct
         #print "J_guess is ", self.J
         #print "J_error is ", J_error
