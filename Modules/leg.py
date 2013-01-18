@@ -177,15 +177,6 @@ class Leg(object):
 
 
 
-
-
-
-
-
-
-
-
-
     def solve_leg_for_real(self):
 
         self.fsolve_output0 = fsolve(self.get_error_I, x0= self.I)

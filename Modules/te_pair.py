@@ -11,12 +11,14 @@ class TE_Pair(object):
     def __init__(self):
 
         """ """
+        self.R_load_total = 1.0
+        self.pairs = 256.0
         self.R_load = 1.0/256.0
         self.length = 1.e-3
         self.leg_area_ratio = 0.8
         self.fill_fraction = 0.3
-        self.Vs = 1.64/256.         # initial guess for Voc
-        self.R_internal = 1./256.   # initial guess for R_internal
+        self.Vs = 1.64/256. 
+        self.R_internal = 1./256.
         self.Vs = 1.64/256.
         
         self.Ptype = leg.Leg()
@@ -28,11 +30,19 @@ class TE_Pair(object):
         self.nodes = 10
         self.set_constants()
 
+    def set_R_load(self):
+        """ """
+        self.R_load = (
+            self.R_load_total / self.pairs
+            )
+
     def set_I(self):
 
         """ """
-        self.I = self.Vs / (self.R_load + self.R_internal)
-        self.set_leg_areas()
+        self.I = (
+            self.Vs/(self.R_load + self.R_internal)
+            )
+        # self.set_leg_areas() #was initially here
         self.Ntype.I = -self.I
         self.Ptype.I = self.I
 
@@ -50,6 +60,9 @@ class TE_Pair(object):
     def set_constants(self):
 
         """ """
+        # self.set_R_load()
+        self.set_leg_areas()
+        self.set_I()
         self.Ntype.length = self.length
         self.Ptype.length = self.length
         self.Ptype.nodes = self.nodes
@@ -138,12 +151,12 @@ class TE_Pair(object):
     def solve_te_pair(self):
 
         """ """
-
+        # self.set_constants()
         self.Ptype.T_h = self.T_h_conv 
         self.Ntype.T_h = self.T_h_conv
         self.Ptype.T_c = self.T_c_conv
         self.Ntype.T_c = self.T_c_conv
-        self.set_I()
+        # self.set_I()  # was initially here
         self.set_q_guess()
 
         knob_arr0 = (
@@ -157,56 +170,4 @@ class TE_Pair(object):
         self.fsolve_output = fsolve(self.get_error, x0=knob_arr0)
         self.V = self.I * self.R_load
         self.P = self.I * self.V
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    # Now we don't need this following technique since I have already
-    # included the J_error inside fsolve
-
-
-    # def get_J_error(self, J):
-    #     """Return the error in actual and guessed J value
-    #     """
-    #     # print "New Guess for J is", self.J
-    #     # print "Internal resistance is ", self.R_internal
-        
-    #     self.solve_te_pair()
-        
-    #     self.J_correct = (
-    #         self.Vs / (self.R_load + self.R_internal)
-    #         )
-        
-    #     self.J_error = self.J_correct - self.J
-    #     print "Seebeck voltage is ", self.Vs
-    #     print "The error in J is ", self.J_error
-    #     return self.J_error
-
-    # def solve_te_pair_for_real(self):
-    #     """ """
-    #     self.fsolve_output0 = fsolve(self.get_J_error, x0= self.J)
 
