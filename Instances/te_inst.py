@@ -17,8 +17,8 @@ te_pair = te_pair.TE_Pair()
 te_pair.Ntype.material = 'MgSi'
 te_pair.Ptype.material = 'HMS'
 
-te_pair.T_c_conv = 300.
-te_pair.T_h_conv = 800.
+te_pair.T_c_conv = 323.
+te_pair.T_h_conv = 443.
 
 te_pair.U_cold = 800000.
 te_pair.U_hot = 20000.
@@ -27,65 +27,16 @@ te_pair.U_hot = 20000.
 
 
 
-R_load = np.linspace(0.001, 1.0, 30)
-R_internal = np.zeros(R_load.size)
-P = np.zeros(R_load.size)
-for i in range(R_load.size):
-    te_pair.R_load = R_load[i]
-    te_pair.solve_te_pair()
-    #print "Actual J is ", te_pair.J
-    P[i] = te_pair.P
-    print "Power is ", P[i]
-    R_internal[i] = te_pair.R_internal
-
-# Plot configuration
-FONTSIZE = 14
-plt.rcParams['axes.labelsize'] = FONTSIZE
-plt.rcParams['axes.titlesize'] = FONTSIZE
-plt.rcParams['legend.fontsize'] = FONTSIZE
-plt.rcParams['xtick.labelsize'] = FONTSIZE
-plt.rcParams['ytick.labelsize'] = FONTSIZE
-plt.rcParams['lines.linewidth'] = 1.5
-plt.rcParams['lines.markersize'] = 10
-
-plt.close()
-
-plt.figure()
-
-plt.plot(R_load, P, 's')
-# plt.plot(R_load, R_internal, 'o')
-plt.grid()
-plt.xlabel('R_load (ohms)')
-plt.ylabel('Power (W)')
-#plt.ylim(0,0)
-#plt.xlim(0,0)
-
-plt.show()
-
-
-
-
-
-
-
-
-
-
-
-
-# R_load_total = np.linspace(0.0, 1.0, 20)
-# R_internal = np.zeros(R_load_total.size)
-# P = np.zeros(R_load_total.size)
-# for i in range(R_load_total.size):
-#     te_pair.R_load_total = R_load_total[i]
-#     # it has to be called for this to work
-#     # te_pair.set_R_load()
+# R_load = np.linspace(0.001, 1.0, 30)
+# R_internal = np.zeros(R_load.size)
+# P = np.zeros(R_load.size)
+# for i in range(R_load.size):
+#     te_pair.R_load = R_load[i]
 #     te_pair.solve_te_pair()
+#     #print "Actual J is ", te_pair.J
 #     P[i] = te_pair.P
-#     R_internal[i] = te_pair.R_internal
-#     print "R_load_total is ", R_load_total[i]
-#     print "R_internal is ", R_internal[i]
 #     print "Power is ", P[i]
+#     R_internal[i] = te_pair.R_internal
 
 # # Plot configuration
 # FONTSIZE = 14
@@ -101,12 +52,61 @@ plt.show()
 
 # plt.figure()
 
-# plt.plot(R_load_total, P, 's')
+# plt.plot(R_load, P, 's')
 # # plt.plot(R_load, R_internal, 'o')
 # plt.grid()
-# plt.xlabel('R_load_total (ohms)')
+# plt.xlabel('R_load (ohms)')
 # plt.ylabel('Power (W)')
 # #plt.ylim(0,0)
 # #plt.xlim(0,0)
 
 # plt.show()
+
+
+
+
+
+
+
+
+
+
+
+
+R_load_total = np.linspace(0.1, 1.5, 20)
+R_internal = np.zeros(R_load_total.size)
+P = np.zeros(R_load_total.size)
+for i in range(R_load_total.size):
+    te_pair.R_load_total = R_load_total[i]
+    # it has to be called for this to work
+    # te_pair.set_R_load()
+    te_pair.solve_te_pair()
+    P[i] = te_pair.P
+    R_internal[i] = te_pair.R_internal
+    print "R_load_total is ", R_load_total[i]
+    print "R_internal is ", R_internal[i]
+    print "Power is ", P[i]
+
+# Plot configuration
+FONTSIZE = 14
+plt.rcParams['axes.labelsize'] = FONTSIZE
+plt.rcParams['axes.titlesize'] = FONTSIZE
+plt.rcParams['legend.fontsize'] = FONTSIZE
+plt.rcParams['xtick.labelsize'] = FONTSIZE
+plt.rcParams['ytick.labelsize'] = FONTSIZE
+plt.rcParams['lines.linewidth'] = 1.5
+plt.rcParams['lines.markersize'] = 10
+
+plt.close()
+
+plt.figure()
+
+plt.plot(R_load_total, P, 's')
+# plt.plot(R_load, R_internal, 'o')
+plt.grid()
+plt.xlabel('R_load_total (ohms)')
+plt.ylabel('Power (W)')
+#plt.ylim(0,0)
+#plt.xlim(0,0)
+
+plt.show()

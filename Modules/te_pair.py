@@ -12,8 +12,8 @@ class TE_Pair(object):
 
         """ """
         self.R_load_total = 1.0
-        self.pairs = 256.0
-        self.R_load = 1.0/256.0
+        self.pairs = 128.0
+        # self.R_load = 1.0/128.0
         self.length = 1.e-3
         self.leg_area_ratio = 0.8
         self.fill_fraction = 0.3
@@ -28,7 +28,7 @@ class TE_Pair(object):
         self.Ntype.material = 'MgSi'
 
         self.nodes = 10
-        self.set_constants()
+        # self.set_constants() was initially here
 
     def set_R_load(self):
         """ """
@@ -60,7 +60,7 @@ class TE_Pair(object):
     def set_constants(self):
 
         """ """
-        # self.set_R_load()
+        self.set_R_load()
         self.set_leg_areas()
         self.set_I()
         self.Ntype.length = self.length
@@ -151,7 +151,7 @@ class TE_Pair(object):
     def solve_te_pair(self):
 
         """ """
-        # self.set_constants()
+        self.set_constants()
         self.Ptype.T_h = self.T_h_conv 
         self.Ntype.T_h = self.T_h_conv
         self.Ptype.T_c = self.T_c_conv
@@ -170,4 +170,5 @@ class TE_Pair(object):
         self.fsolve_output = fsolve(self.get_error, x0=knob_arr0)
         self.V = self.I * self.R_load
         self.P = self.I * self.V
+        self.P_total = self.P * self.pairs
 
