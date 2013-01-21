@@ -105,23 +105,30 @@ class Leg(object):
         # Multiply q_h and q_c by area to get rid of this error
 
         # self.P = self.R_load * self.I ** 2
+        
+
+
         self.P = self.I * self.V
+        print "\nPower output is ", self.P
+        # Sanity check.  q_h - q_c should be nearly equal but not
+        # exactly equal to P.  It is not exact because of spatial
+        # asymmetry in electrical resistivity along the leg.  I
+        # imported assert_approx_equal in the front matter to make
+        # this print an error if there is too much disagreement.
 
-        # # Sanity check.  q_h - q_c should be nearly equal but not
-        # # exactly equal to P.  It is not exact because of spatial
-        # # asymmetry in electrical resistivity along the leg.  I
-        # # imported assert_approx_equal in the front matter to make
-        # # this print an error if there is too much disagreement.
+        # at the beginning, they do not match so we get an error, as
+        # the iteration continues, the error disappears
 
-        # self.P_from_heat = (self.q_h - self.q_c) * self.area
+        self.P_from_heat = (self.q_h - self.q_c) * self.area
+        print "P from heat is ", self.P_from_heat
 
-        # sig_figs = 3
-        # try:
-        #     assert_approx_equal(self.P, self.P_from_heat, sig_figs)
-        # except AssertionError:
-        #     print "\nPower from q_h - q_c and I**2 * R disagree."
-        #     print "Consider reducing sig_figs under solve_leg_once"
-        #     print "in leg.py if you think this is an error."
+        sig_figs = 4
+        try:
+            assert_approx_equal(self.P, self.P_from_heat, sig_figs)
+        except AssertionError:
+            print "\nPower from q_h - q_c and I**2 * R disagree."
+            print "Consider reducing sig_figs under solve_leg_once"
+            print "in leg.py if you think this is an error."
 
     def get_dTq_dx(self, Tq, x):
 
@@ -168,6 +175,14 @@ class Leg(object):
         self.q_c_guess = self.q_c
         self.q_h_guess = self.q_h
         self.q_guess = self.q_h
+
+
+
+
+
+
+
+
 
 
 

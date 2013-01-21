@@ -135,13 +135,13 @@ class TE_Pair(object):
         q_c_error = self.q_c - self.q_c_conv
         q_h_error = self.q_h - self.q_h_conv
         I_error = self.I_correct - self.I
-        print "\n"
-        print "\n"
-        print "\nI_correct is ", self.I_correct
-        print "I_guess is ", self.I
-        print "I_error is ", I_error
-        print "\n"
-        print "\n"
+        # print "\n"
+        # print "\n"
+        # print "\nI_correct is ", self.I_correct
+        # print "I_guess is ", self.I
+        # print "I_error is ", I_error
+        # print "\n"
+        # print "\n"
 
         self.error = (
             np.array([T_c_error, q_c_error, q_h_error, I_error]).flatten()
