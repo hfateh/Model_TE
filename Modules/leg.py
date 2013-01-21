@@ -13,9 +13,6 @@ class Leg(object):
     """ Class for individual TE leg.
 
     Methods:
-    
-
-
     """
 
     def __init__(self):
@@ -23,8 +20,11 @@ class Leg(object):
         """ sets constants and binds methods
 
         """
-        # Initial guess
-        self.I_guess = 1.5
+        self.C = 1.e7
+        self.t_array = np.linspace(0., 5., 10)
+
+
+
         self.Vs = 1.64/256.0
         self.R_internal = 1.0/256
 
@@ -108,27 +108,27 @@ class Leg(object):
         
 
 
-        self.P = self.I * self.V
-        print "\nPower output is ", self.P
-        # Sanity check.  q_h - q_c should be nearly equal but not
-        # exactly equal to P.  It is not exact because of spatial
-        # asymmetry in electrical resistivity along the leg.  I
-        # imported assert_approx_equal in the front matter to make
-        # this print an error if there is too much disagreement.
+        # self.P = self.I * self.V
+        # print "\nPower output is ", self.P
+        # # Sanity check.  q_h - q_c should be nearly equal but not
+        # # exactly equal to P.  It is not exact because of spatial
+        # # asymmetry in electrical resistivity along the leg.  I
+        # # imported assert_approx_equal in the front matter to make
+        # # this print an error if there is too much disagreement.
 
-        # at the beginning, they do not match so we get an error, as
-        # the iteration continues, the error disappears
+        # # at the beginning, they do not match so we get an error, as
+        # # the iteration continues, the error disappears
 
-        self.P_from_heat = (self.q_h - self.q_c) * self.area
-        print "P from heat is ", self.P_from_heat
+        # self.P_from_heat = (self.q_h - self.q_c) * self.area
+        # print "P from heat is ", self.P_from_heat
 
-        sig_figs = 4
-        try:
-            assert_approx_equal(self.P, self.P_from_heat, sig_figs)
-        except AssertionError:
-            print "\nPower from q_h - q_c and I**2 * R disagree."
-            print "Consider reducing sig_figs under solve_leg_once"
-            print "in leg.py if you think this is an error."
+        # sig_figs = 3
+        # try:
+        #     assert_approx_equal(self.P, self.P_from_heat, sig_figs)
+        # except AssertionError:
+        #     print "\nPower from q_h - q_c and I**2 * R disagree."
+        #     print "Consider reducing sig_figs under solve_leg_once"
+        #     print "in leg.py if you think this is an error."
 
     def get_dTq_dx(self, Tq, x):
 
@@ -175,6 +175,133 @@ class Leg(object):
         self.q_c_guess = self.q_c
         self.q_h_guess = self.q_h
         self.q_guess = self.q_h
+
+
+    # ===========================================
+    # everything above this is steady state 
+    # everything below this is for transient only
+    # ===========================================
+
+
+    def solve_leg_transient(self):
+
+        """Solves leg based on array of transient BC's."""
+
+        self.delta_x = self.x[1] - self.x[0]
+
+        self.y0 = self.T_x
+
+        try: 
+            self.T_xt
+
+        except AttributeError:
+            self.odeint_output = odeint(
+                self.get_dTx_dt, y0=self.y0, t=self.t_array,
+                full_output=1 
+                )
+            self.T_xt = self.odeint_output[0]
+
+        else:
+            self.y0 = self.T_xt[-1,:]
+            self.odeint_output = odeint(
+                self.get_dTx_dt, y0=self.y0, t=self.t_array,
+                full_output=1 
+                )
+            self.T_xt = np.concatenate((self.T_xt, self.odeint_output[0]))
+
+    def get_dTx_dt(self, T, t):
+
+        """Returns derivative of array of T wrt time.
+        """
+        
+        J = self.I/self.area
+        self.dT_dt = np.zeros(T.size)
+        self.q0 = np.zeros(T.size)
+        self.dq_dx_ss = np.zeros(T.size)
+        self.dq_dx = np.zeros(T.size)
+        self.dT_dx = np.zeros(T.size)
+
+        self.dT_dx[1:-1] = 0.5 * (T[2:] - T[:-2]) / self.delta_x  
+        self.dT_dx[0] = (T[1] - T[0]) / self.delta_x
+        self.dT_dx[-1] = (T[-1] - T[-2]) / self.delta_x
+
+        for i in range(self.nodes):
+
+            T_props = T[i]  # i for central differencing
+            self.set_TEproperties(T_props)
+            self.set_ZT()
+
+            self.q0[i] = (
+                J * T[i] * self.alpha - self.k * self.dT_dx[i]
+                ) 
+
+            self.dq_dx_ss[i] = (
+                (self.rho * J ** 2. * (1. + self.ZT)) - J *
+                self.alpha * self.q0[i] / self.k
+                )
+
+        # hot side BC, q_h
+        self.q0[0] = self.U_hot * (self.T_h_conv - T[0]) 
+
+        # cold side BC, q_c 
+        self.q0[-1] = self.U_cold * (T[-1] - self.T_c_conv)
+
+        self.dq_dx[1:-1] = (
+            (self.q0[2:] - self.q0[:-2]) / (2. * self.delta_x)
+            )
+        self.dq_dx[0] = (
+            (self.q0[1] - self.q0[0]) / self.delta_x
+            )
+        self.dq_dx[-1] = (
+            (self.q0[-1] - self.q0[-2]) / self.delta_x
+            )
+
+        for i in range(self.nodes):
+
+            T_props = T[i]  # i for central differencing
+            self.set_TEproperties(T_props)
+            self.set_ZT()
+
+            self.dT_dt[i] = (
+                1. / self.C * (-self.dq_dx[i] + self.dq_dx_ss[i])
+                )
+
+        return self.dT_dt
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
