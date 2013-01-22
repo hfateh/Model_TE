@@ -93,14 +93,14 @@ class Leg(object):
         self.T_x = self.y[:,0]
         self.q_x = self.y[:,1]
         self.Vs_x = self.y[:,2]
-        self.R_int_x = self.y[:,3]
+        self.R_x = self.y[:,3]
         
         self.T_c = self.T_x[-1]
         self.q_c = self.q_x[-1]
         
         self.Vs = self.Vs_x[0] - self.Vs_x[-1]
         self.V = self.R_load * self.I
-        self.R_internal = self.R_int_x[-1]
+        self.R_internal = self.R_x[-1]
 
         # Multiply q_h and q_c by area to get rid of this error
 
@@ -132,7 +132,7 @@ class Leg(object):
 
     def get_dTq_dx(self, Tq, x):
 
-        #print "Tq array inside dTq_dx is \n", Tq
+        # print "Tq array inside dTq_dx is \n", Tq
         T = Tq[0]
         q = Tq[1]
         
@@ -150,6 +150,7 @@ class Leg(object):
         dVs_dx = (self.alpha * dT_dx)
         dR_dx = (self.rho / self.area)
 
+        # print "\n", dT_dx, dq_dx, dVs_dx, dR_dx, "\n"
         return dT_dx, dq_dx, dVs_dx, dR_dx
     
     def set_q_guess(self):
@@ -182,14 +183,106 @@ class Leg(object):
     # everything below this is for transient only
     # ===========================================
 
+    def get_dTx_dt(self, T, t):
 
-    def solve_leg_transient(self):
+        """Returns derivative of array of T wrt time.
+        """
+        # =============================================
+        # make sure that a 2D array T is being returned
+        # 2D array flattened into a very long 1D array
+        # =============================================
+
+        J = self.I/self.area
+        dT_dt = np.zeros(T.size)
+        dR_dx = np.zeros(T.size)
+        dVs_dx = np.zeros(T.size)
+        q0 = np.zeros(T.size)
+        dq_dx_ss = np.zeros(T.size)
+        dq_dx = np.zeros(T.size)
+        dT_dx = np.zeros(T.size)
+
+        dT_dx[1:-1] = 0.5 * (T[2:] - T[:-2]) / self.delta_x  
+        dT_dx[0] = (T[1] - T[0]) / self.delta_x
+        dT_dx[-1] = (T[-1] - T[-2]) / self.delta_x
+
+        for i in range(self.nodes):
+
+            T_props = T[i]  # i for central differencing
+            self.set_TEproperties(T_props)
+            self.set_ZT()
+
+            dR_dx[i] = self.rho * self.area
+
+            dVs_dx[i] = self.alpha * dT_dx[i]
+
+            q0[i] = (
+                J * T[i] * self.alpha - self.k * dT_dx[i]
+                ) 
+
+            dq_dx_ss[i] = (
+                (self.rho * J ** 2. * (1. + self.ZT)) - J *
+                self.alpha * q0[i] / self.k
+                )
+
+        # hot side BC, q_h
+        q0[0] = self.U_hot * (self.T_h_conv - T[0]) 
+
+        # cold side BC, q_c 
+        q0[-1] = self.U_cold * (T[-1] - self.T_c_conv)
+
+        dq_dx[1:-1] = (
+            (q0[2:] - q0[:-2]) / (2. * self.delta_x)
+            )
+        dq_dx[0] = (
+            (q0[1] - q0[0]) / self.delta_x
+            )
+        dq_dx[-1] = (
+            (q0[-1] - q0[-2]) / self.delta_x
+            )
+
+        for i in range(self.nodes):
+
+            T_props = T[i]  # i for central differencing
+            self.set_TEproperties(T_props)
+            self.set_ZT()
+
+            dT_dt[i] = (
+                1. / self.C * (-dq_dx[i] + dq_dx_ss[i])
+                )
+
+        # dVs_dx = self.alpha * dT_dx
+        # dR_dx = self.rho * self.area
+        
+        # print "\ndT_dt is \n", dT_dt
+        # print "\ndq_dx is \n", dq_dx
+        # print "\ndVs_dx is \n", dVs_dx
+        # print "\ndR_dx is \n", dR_dx
+
+        # which dq_dx should I return??? both or just one?
+        # need to return bunch of stuff from here
+        # not only dT_dt
+
+        # return self.dT_dt, self.dq_dx, self.dVs_dx, self.dR_dx
+        # self.return_array = (
+        #     np.array([dT_dt, dq_dx, dVs_dx, dR_dx]).flatten()
+        #     )
+        # print "return_array is ", self.return_array
+        # return self.return_array
+        # print "\ndT_dt is \n", dT_dt
+        return dT_dt
+
+
+    def solve_leg_transient_once(self):
 
         """Solves leg based on array of transient BC's."""
 
         self.delta_x = self.x[1] - self.x[0]
 
+        # self.y0 = np.array([self.T_x, self.q_x, self.Vs_x, self.R_x]).flatten()
+        # print "\nAfter flatten, y0 reads like \n", self.y0
+        
         self.y0 = self.T_x
+        # need to use flatten here and provide more guess
 
         try: 
             self.T_xt
@@ -209,69 +302,24 @@ class Leg(object):
                 )
             self.T_xt = np.concatenate((self.T_xt, self.odeint_output[0]))
 
-    def get_dTx_dt(self, T, t):
 
-        """Returns derivative of array of T wrt time.
-        """
-        
-        J = self.I/self.area
-        self.dT_dt = np.zeros(T.size)
-        self.q0 = np.zeros(T.size)
-        self.dq_dx_ss = np.zeros(T.size)
-        self.dq_dx = np.zeros(T.size)
-        self.dT_dx = np.zeros(T.size)
+    # def get_transient_error(self):
+    #     """ """
+    #     # find all the errors based on one run
 
-        self.dT_dx[1:-1] = 0.5 * (T[2:] - T[:-2]) / self.delta_x  
-        self.dT_dx[0] = (T[1] - T[0]) / self.delta_x
-        self.dT_dx[-1] = (T[-1] - T[-2]) / self.delta_x
+    #     # can also do something like following 
+    #     self.error = (
+    #         np.array([T_c_error, q_c_error, q_h_error, I_error]).flatten()
+    #         )
+    #     return self.error
 
-        for i in range(self.nodes):
 
-            T_props = T[i]  # i for central differencing
-            self.set_TEproperties(T_props)
-            self.set_ZT()
-
-            self.q0[i] = (
-                J * T[i] * self.alpha - self.k * self.dT_dx[i]
-                ) 
-
-            self.dq_dx_ss[i] = (
-                (self.rho * J ** 2. * (1. + self.ZT)) - J *
-                self.alpha * self.q0[i] / self.k
-                )
-
-        # hot side BC, q_h
-        self.q0[0] = self.U_hot * (self.T_h_conv - T[0]) 
-
-        # cold side BC, q_c 
-        self.q0[-1] = self.U_cold * (T[-1] - self.T_c_conv)
-
-        self.dq_dx[1:-1] = (
-            (self.q0[2:] - self.q0[:-2]) / (2. * self.delta_x)
-            )
-        self.dq_dx[0] = (
-            (self.q0[1] - self.q0[0]) / self.delta_x
-            )
-        self.dq_dx[-1] = (
-            (self.q0[-1] - self.q0[-2]) / self.delta_x
-            )
-
-        for i in range(self.nodes):
-
-            T_props = T[i]  # i for central differencing
-            self.set_TEproperties(T_props)
-            self.set_ZT()
-
-            self.dT_dt[i] = (
-                1. / self.C * (-self.dq_dx[i] + self.dq_dx_ss[i])
-                )
-
-        return self.dT_dt
+    #     return self.transient_error
 
 
 
 
-
+    # Change transient stuff so that all the self. is gone
 
 
 

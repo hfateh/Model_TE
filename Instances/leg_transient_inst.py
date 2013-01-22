@@ -15,7 +15,7 @@ leg = leg.Leg()
 leg.length = 3.56e-4
 leg.I = 13.
 leg.material = 'HMS'
-leg.nodes = 50
+leg.nodes = 5
 leg.t_array = np.linspace(0, 1, 10)
 
 leg.T_h_conv = 300.
@@ -29,10 +29,10 @@ leg.set_constants()
 leg.solve_leg()
 
 leg.T_h_conv += 300.
-leg.solve_leg_transient()
-leg.T_h_conv -= 300.
-leg.T_c_conv += 15. 
-leg.solve_leg_transient()
+leg.solve_leg_transient_once()
+#leg.T_h_conv -= 300.
+#leg.T_c_conv += 15. 
+#leg.solve_leg_transient_once()
 
 # Plot configuration
 FONTSIZE = 14
@@ -51,7 +51,7 @@ plt.figure()
 for i in range(leg.t_array.size):
     j = i + leg.t_array.size
     plt.plot(leg.x * 1e3, leg.T_xt[i, :])
-    plt.plot(leg.x * 1e3, leg.T_xt[j, :])
+    #plt.plot(leg.x * 1e3, leg.T_xt[j, :])
 
 plt.grid()
 plt.xlabel('Position (mm)')
