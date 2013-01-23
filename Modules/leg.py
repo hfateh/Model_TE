@@ -23,8 +23,6 @@ class Leg(object):
         self.C = 1.e7
         self.t_array = np.linspace(0., 5., 10)
 
-
-
         self.Vs = 1.64/256.0
         self.R_internal = 1.0/256
 
@@ -132,7 +130,6 @@ class Leg(object):
 
     def get_dTq_dx(self, Tq, x):
 
-        # print "Tq array inside dTq_dx is \n", Tq
         T = Tq[0]
         q = Tq[1]
         
@@ -150,7 +147,6 @@ class Leg(object):
         dVs_dx = (self.alpha * dT_dx)
         dR_dx = (self.rho / self.area)
 
-        # print "\n", dT_dx, dq_dx, dVs_dx, dR_dx, "\n"
         return dT_dx, dq_dx, dVs_dx, dR_dx
     
     def set_q_guess(self):
@@ -177,11 +173,12 @@ class Leg(object):
         self.q_h_guess = self.q_h
         self.q_guess = self.q_h
 
-
-    # ===========================================
-    # everything above this is steady state 
-    # everything below this is for transient only
-    # ===========================================
+# ===========================================
+# ===========================================
+# everything above this is steady state 
+# everything below this is for transient only
+# ===========================================
+# ===========================================
 
     def get_dTx_dt(self, T, t):
 
@@ -190,17 +187,37 @@ class Leg(object):
         # =============================================
         # make sure that a 2D array T is being returned
         # 2D array flattened into a very long 1D array
+        # need to divide this T by number of varables
         # =============================================
 
+        # T is basically the same as y0
+        # print "\nT is as follows\n", T
+        
+        # I have to make empty arrays
+        
+        # T = TqVsR
+        # u = TqVsR.size/self.nodes
         J = self.I/self.area
-        dT_dt = np.zeros(T.size)
-        dR_dx = np.zeros(T.size)
-        dVs_dx = np.zeros(T.size)
+
+        dT_dx = np.zeros(T.size)
         q0 = np.zeros(T.size)
         dq_dx_ss = np.zeros(T.size)
         dq_dx = np.zeros(T.size)
-        dT_dx = np.zeros(T.size)
+        dT_dt = np.zeros(T.size)
 
+        # dR_dx = np.zeros(T.size)
+        # dVs_dx = np.zeros(T.size)
+
+        # dT_dx = np.zeros(u)
+        # q0 = np.zeros(u)
+        # dq_dx_ss = np.zeros(u)
+        # dq_dx = np.zeros(u)
+        # dT_dt = np.zeros(u)
+
+        # dR_dx = np.zeros(u)
+        # dVs_dx = np.zeros(u)
+        
+        # This is dT_dx
         dT_dx[1:-1] = 0.5 * (T[2:] - T[:-2]) / self.delta_x  
         dT_dx[0] = (T[1] - T[0]) / self.delta_x
         dT_dx[-1] = (T[-1] - T[-2]) / self.delta_x
@@ -211,25 +228,26 @@ class Leg(object):
             self.set_TEproperties(T_props)
             self.set_ZT()
 
-            dR_dx[i] = self.rho * self.area
+            # dR_dx[i] = self.rho * self.area
 
-            dVs_dx[i] = self.alpha * dT_dx[i]
+            # dVs_dx[i] = self.alpha * dT_dx[i]
 
             q0[i] = (
                 J * T[i] * self.alpha - self.k * dT_dx[i]
                 ) 
-
+            # dq_dx_ss based on old q0
             dq_dx_ss[i] = (
                 (self.rho * J ** 2. * (1. + self.ZT)) - J *
                 self.alpha * q0[i] / self.k
                 )
-
+        # update q0
         # hot side BC, q_h
         q0[0] = self.U_hot * (self.T_h_conv - T[0]) 
 
         # cold side BC, q_c 
         q0[-1] = self.U_cold * (T[-1] - self.T_c_conv)
 
+        # this is dq_dx
         dq_dx[1:-1] = (
             (q0[2:] - q0[:-2]) / (2. * self.delta_x)
             )
@@ -246,47 +264,32 @@ class Leg(object):
             self.set_TEproperties(T_props)
             self.set_ZT()
 
+            # this is dT_dt
             dT_dt[i] = (
                 1. / self.C * (-dq_dx[i] + dq_dx_ss[i])
                 )
 
-        # dVs_dx = self.alpha * dT_dx
-        # dR_dx = self.rho * self.area
-        
-        # print "\ndT_dt is \n", dT_dt
-        # print "\ndq_dx is \n", dq_dx
-        # print "\ndVs_dx is \n", dVs_dx
-        # print "\ndR_dx is \n", dR_dx
-
-        # which dq_dx should I return??? both or just one?
-        # need to return bunch of stuff from here
-        # not only dT_dt
-
-        # return self.dT_dt, self.dq_dx, self.dVs_dx, self.dR_dx
         # self.return_array = (
         #     np.array([dT_dt, dq_dx, dVs_dx, dR_dx]).flatten()
         #     )
-        # print "return_array is ", self.return_array
+        
         # return self.return_array
-        # print "\ndT_dt is \n", dT_dt
-        return dT_dt
 
+        return dT_dt
 
     def solve_leg_transient_once(self):
 
         """Solves leg based on array of transient BC's."""
 
         self.delta_x = self.x[1] - self.x[0]
-
-        # self.y0 = np.array([self.T_x, self.q_x, self.Vs_x, self.R_x]).flatten()
-        # print "\nAfter flatten, y0 reads like \n", self.y0
+        #self.y0 = np.array([self.T_x, self.q_x, self.Vs_x, self.R_x]).flatten()
+        #print "\nAfter flatten, y0 reads like \n", self.y0
         
         self.y0 = self.T_x
-        # need to use flatten here and provide more guess
 
         try: 
             self.T_xt
-
+        # basically this command is being run, not the bottom one
         except AttributeError:
             self.odeint_output = odeint(
                 self.get_dTx_dt, y0=self.y0, t=self.t_array,
@@ -294,6 +297,7 @@ class Leg(object):
                 )
             self.T_xt = self.odeint_output[0]
 
+        # doesnt really get here
         else:
             self.y0 = self.T_xt[-1,:]
             self.odeint_output = odeint(
@@ -301,8 +305,10 @@ class Leg(object):
                 full_output=1 
                 )
             self.T_xt = np.concatenate((self.T_xt, self.odeint_output[0]))
-
-
+            
+        print "\nDid get through all the calculations without error \n"
+        
+    
     # def get_transient_error(self):
     #     """ """
     #     # find all the errors based on one run
@@ -319,7 +325,173 @@ class Leg(object):
 
 
 
-    # Change transient stuff so that all the self. is gone
+
+
+
+
+
+
+
+#===========================================
+#===========================================
+#===========================================
+# The following code is correct, if any screw up happens, copy and
+# paste this in place of the codes given above. At least the following
+# ones work. 
+#===========================================
+#===========================================
+
+    # def get_dTx_dt(self, T, t):
+
+    #     """Returns derivative of array of T wrt time.
+    #     """
+    #     # =============================================
+    #     # make sure that a 2D array T is being returned
+    #     # 2D array flattened into a very long 1D array
+    #     # need to divide this T by number of varables
+    #     # =============================================
+
+    #     J = self.I/self.area
+    #     dT_dt = np.zeros(T.size)
+    #     dR_dx = np.zeros(T.size)
+    #     dVs_dx = np.zeros(T.size)
+    #     q0 = np.zeros(T.size)
+    #     dq_dx_ss = np.zeros(T.size)
+    #     dq_dx = np.zeros(T.size)
+    #     dT_dx = np.zeros(T.size)
+
+    #     dT_dx[1:-1] = 0.5 * (T[2:] - T[:-2]) / self.delta_x  
+    #     dT_dx[0] = (T[1] - T[0]) / self.delta_x
+    #     dT_dx[-1] = (T[-1] - T[-2]) / self.delta_x
+
+    #     for i in range(self.nodes):
+
+    #         T_props = T[i]  # i for central differencing
+    #         self.set_TEproperties(T_props)
+    #         self.set_ZT()
+
+    #         dR_dx[i] = self.rho * self.area
+
+    #         dVs_dx[i] = self.alpha * dT_dx[i]
+
+    #         q0[i] = (
+    #             J * T[i] * self.alpha - self.k * dT_dx[i]
+    #             ) 
+
+    #         dq_dx_ss[i] = (
+    #             (self.rho * J ** 2. * (1. + self.ZT)) - J *
+    #             self.alpha * q0[i] / self.k
+    #             )
+
+    #     # hot side BC, q_h
+    #     q0[0] = self.U_hot * (self.T_h_conv - T[0]) 
+
+    #     # cold side BC, q_c 
+    #     q0[-1] = self.U_cold * (T[-1] - self.T_c_conv)
+
+    #     dq_dx[1:-1] = (
+    #         (q0[2:] - q0[:-2]) / (2. * self.delta_x)
+    #         )
+    #     dq_dx[0] = (
+    #         (q0[1] - q0[0]) / self.delta_x
+    #         )
+    #     dq_dx[-1] = (
+    #         (q0[-1] - q0[-2]) / self.delta_x
+    #         )
+
+    #     for i in range(self.nodes):
+
+    #         T_props = T[i]  # i for central differencing
+    #         self.set_TEproperties(T_props)
+    #         self.set_ZT()
+
+    #         dT_dt[i] = (
+    #             1. / self.C * (-dq_dx[i] + dq_dx_ss[i])
+    #             )
+
+    #     # dVs_dx = self.alpha * dT_dx
+    #     # dR_dx = self.rho * self.area
+        
+    #     # print "\ndT_dt is \n", dT_dt
+    #     # print "\ndq_dx is \n", dq_dx
+    #     # print "\ndVs_dx is \n", dVs_dx
+    #     # print "\ndR_dx is \n", dR_dx
+
+    #     # which dq_dx should I return??? both or just one?
+    #     # need to return bunch of stuff from here
+    #     # not only dT_dt
+
+    #     # return self.dT_dt, self.dq_dx, self.dVs_dx, self.dR_dx
+    #     # self.return_array = (
+    #     #     np.array([dT_dt, dq_dx, dVs_dx, dR_dx]).flatten()
+    #     #     )
+    #     # print "return_array is ", self.return_array
+    #     # return self.return_array
+    #     # print "\ndT_dt is \n", dT_dt
+
+
+    #     # self.return_array = (
+    #     #     np.array([dT_dt, dq_dx, dVs_dx, dR_dx]).flatten()
+    #     #     )
+        
+    #     # return self.return_array
+
+    #     return dT_dt
+
+    # def solve_leg_transient_once(self):
+
+    #     """Solves leg based on array of transient BC's."""
+
+    #     self.delta_x = self.x[1] - self.x[0]
+
+    #     # self.y0 = np.array([self.T_x, self.q_x, self.Vs_x, self.R_x]).flatten()
+    #     # print "\nAfter flatten, y0 reads like \n", self.y0
+        
+    #     self.y0 = self.T_x
+    #     # need to use flatten here and provide more guess
+
+    #     try: 
+    #         self.T_xt
+
+    #     except AttributeError:
+    #         self.odeint_output = odeint(
+    #             self.get_dTx_dt, y0=self.y0, t=self.t_array,
+    #             full_output=1 
+    #             )
+    #         self.T_xt = self.odeint_output[0]
+
+    #     else:
+    #         self.y0 = self.T_xt[-1,:]
+    #         self.odeint_output = odeint(
+    #             self.get_dTx_dt, y0=self.y0, t=self.t_array,
+    #             full_output=1 
+    #             )
+    #         self.T_xt = np.concatenate((self.T_xt, self.odeint_output[0]))
+
+
+    # # def get_transient_error(self):
+    # #     """ """
+    # #     # find all the errors based on one run
+
+    # #     # can also do something like following 
+    # #     self.error = (
+    # #         np.array([T_c_error, q_c_error, q_h_error, I_error]).flatten()
+    # #         )
+    # #     return self.error
+
+
+    # #     return self.transient_error
+
+
+
+
+
+#===========================================
+#===========================================
+# Upto here 
+#===========================================
+#===========================================
+
 
 
 
