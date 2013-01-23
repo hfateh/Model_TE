@@ -15,7 +15,7 @@ leg = leg.Leg()
 leg.length = 3.56e-4
 leg.I = 13.
 leg.material = 'HMS'
-leg.nodes = 50
+leg.nodes = 8
 leg.t_array = np.linspace(0, 1, 10)
 
 leg.T_h_conv = 300.
@@ -23,7 +23,7 @@ leg.U_hot = 54e3
 leg.T_c_conv = 300.
 leg.U_cold = 253e3
 
-leg.t_array = np.logspace(np.log10(0.001), np.log10(1), 10)
+leg.t_array = np.logspace(np.log10(0.001), np.log10(1), 5)
 leg.set_constants()
 
 leg.solve_leg()

@@ -282,8 +282,11 @@ class Leg(object):
         """Solves leg based on array of transient BC's."""
 
         self.delta_x = self.x[1] - self.x[0]
-        #self.y0 = np.array([self.T_x, self.q_x, self.Vs_x, self.R_x]).flatten()
-        #print "\nAfter flatten, y0 reads like \n", self.y0
+        self.y0 = np.array([self.T_x, self.q_x, self.Vs_x, self.R_x]).flatten()
+        print "\nAfter flatten, y0 reads like \n", self.y0
+
+        self.y0.shape = (4,self.nodes)
+        print "\nafter reshape, y0 looks like \n", self.y0
         
         self.y0 = self.T_x
 
