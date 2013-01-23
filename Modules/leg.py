@@ -132,7 +132,7 @@ class Leg(object):
 
         T = Tq[0]
         q = Tq[1]
-        
+
         self.set_TEproperties(T)
         self.set_ZT()
         J = self.I / self.area
@@ -181,6 +181,7 @@ class Leg(object):
 # ===========================================
 
     def get_dTx_dt(self, T, t):
+    # def get_dTx_dt(self, TqVsR, t):
 
         """Returns derivative of array of T wrt time.
         """
@@ -191,12 +192,19 @@ class Leg(object):
         # =============================================
 
         # T is basically the same as y0
-        # print "\nT is as follows\n", T
+        # 4 for 4 terms - T_x, q_x, Vs_x, and R_x
+        # TqVsR.shape = (4, self.nodes)
+        # print "\nafter reshape, TqVsR looks like \n", TqVsR
         
-        # I have to make empty arrays
-        
-        # T = TqVsR
-        # u = TqVsR.size/self.nodes
+        # ===========================================
+        # VERY IMPORTANT - all of TqVsR doesn't need to be used
+        # ===========================================
+
+        # T = TqVsR[0,:]
+        # q_x = TqVsR[1,:]
+        # Vs_x = TqVsR[2,:]
+        # T_x = TqVsR[3,:]
+
         J = self.I/self.area
 
         dT_dx = np.zeros(T.size)
@@ -285,9 +293,6 @@ class Leg(object):
         self.y0 = np.array([self.T_x, self.q_x, self.Vs_x, self.R_x]).flatten()
         print "\nAfter flatten, y0 reads like \n", self.y0
 
-        self.y0.shape = (4,self.nodes)
-        print "\nafter reshape, y0 looks like \n", self.y0
-        
         self.y0 = self.T_x
 
         try: 
