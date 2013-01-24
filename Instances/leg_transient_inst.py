@@ -13,17 +13,17 @@ reload(leg)
 
 leg = leg.Leg()
 leg.length = 3.56e-4
-leg.I = 13.
+# leg.I = 13.
 leg.material = 'HMS'
-leg.nodes = 8
+leg.nodes = 50
 leg.t_array = np.linspace(0, 1, 10)
 
-leg.T_h_conv = 300.
+leg.T_h_conv = 400.
 leg.U_hot = 54e3
 leg.T_c_conv = 300.
 leg.U_cold = 253e3
 
-leg.t_array = np.logspace(np.log10(0.001), np.log10(1), 5)
+#leg.t_array = np.logspace(np.log10(0.001), np.log10(1), 10)
 leg.set_constants()
 
 leg.solve_leg()
@@ -50,13 +50,13 @@ plt.figure()
 
 for i in range(leg.t_array.size):
     j = i + leg.t_array.size
-    plt.plot(leg.x * 1e3, leg.T_xt[i, :])
+    plt.plot(leg.x * 1e3, leg.Txt[i, :])
     #plt.plot(leg.x * 1e3, leg.T_xt[j, :])
 
 plt.grid()
 plt.xlabel('Position (mm)')
 plt.ylabel('Temperature (K)')
-plt.ylim(leg.T_xt.min() - 25., leg.T_xt.max() + 25.)
+plt.ylim(leg.Txt.min() - 25., leg.Txt.max() + 25.)
 plt.xlim(-0.05, 0.40)
 plt.subplots_adjust(left=0.15)
 
