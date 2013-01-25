@@ -15,8 +15,8 @@ leg = leg.Leg()
 leg.length = 3.56e-4
 # leg.I = 13.
 leg.material = 'HMS'
-leg.nodes = 50
-leg.t_array = np.linspace(0, 1, 10)
+leg.nodes = 20
+leg.t_array = np.linspace(0, 1, 50)
 
 leg.T_h_conv = 400.
 leg.U_hot = 54e3
@@ -48,18 +48,21 @@ plt.close()
 
 plt.figure()
 
-for i in range(leg.t_array.size):
-    j = i + leg.t_array.size
-    plt.plot(leg.x * 1e3, leg.Rxt[i, :])
-    #plt.plot(leg.x * 1e3, leg.T_xt[j, :])
+plt.plot(leg.t_array, leg.I_transient)
+# plt.plot(leg.t_array, leg.Power_transient)
+# for i in range(leg.t_array.size):
+#     j = i + leg.t_array.size
+#     plt.plot(leg.x * 1e3, leg.Vsxt[i, :])
+#     #plt.plot(leg.x * 1e3, leg.Rxt[i, :])
+#     #plt.plot(leg.x * 1e3, leg.T_xt[j, :])
 
-plt.grid()
-plt.xlabel('Position (mm)')
-plt.ylabel('Temperature (K)')
-plt.ylim(leg.Rxt.min() - 25., leg.Rxt.max() + 25.)
-plt.xlim(-0.05, 0.40)
-plt.subplots_adjust(left=0.15)
+# plt.grid()
+# plt.xlabel('Position (mm)')
+# plt.ylabel('Temperature (K)')
+# plt.ylim(leg.Rxt.min() - 25., leg.Rxt.max() + 25.)
+# plt.xlim(-0.05, 0.40)
+# plt.subplots_adjust(left=0.15)
 
-#plt.savefig('../Plots/leg_instance/transient.pdf')
+# #plt.savefig('../Plots/leg_instance/transient.pdf')
 
 plt.show()
