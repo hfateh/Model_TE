@@ -31,7 +31,7 @@ class Leg(object):
         self.T_c_conv = 323.
         self.U_hot = 54.e2
         self.U_cold = 253.e3
-        self.R_load = 1.0
+        self.R_load = 1.0/256.0
         self.nodes = 10
         self.length = 1.5e-3
         self.area = (3.0e-3) ** 2 
@@ -183,6 +183,11 @@ class Leg(object):
 
 
 
+
+
+
+
+
     # def get_dTx_dt(self, T, t):
     def get_dTx_dt(self, TqVsR, t):
 
@@ -194,9 +199,15 @@ class Leg(object):
         T = TqVsR[0,:]
         # Vs_x = TqVsR[2,:]
         # R_x = TqVsR[3,:]
-
-        J = self.I/self.area
-
+        
+        # ====================================
+        # Need to make a 1D array of current
+        # ====================================
+        #self.I_transient = np.zeros(1,self.t_array.size)
+        #self.I_transient[:,0] = self.I
+        #J = self.I_transient / self.area
+        J = self.I / self.area
+        
         dT_dx = np.zeros(T.size)
         q0 = np.zeros(T.size)
         dq_dx_ss = np.zeros(T.size)
@@ -255,6 +266,13 @@ class Leg(object):
 
             dVs_dt[i] = self.alpha * dT_dt[i]
 
+            # 
+
+            # need a delta_t here that changes every loop  so that log
+            # scale can be used
+
+
+            # 
             dR_dt[i] = (
                 self.rho * self.delta_x / self.area * self.delta_t
                 )
@@ -302,47 +320,264 @@ class Leg(object):
 
         self.R_internal_transient = self.Rxt[:,-1]        
         self.Vs_transient = self.Vsxt[:,0] - self.Vsxt[:,-1]
-        # self.Vs_power = self.Vs_transient * self.I_transient
+        
+        self.I_transient = (
+            self.Vs_transient/(self.R_load + self.R_internal_transient)
+            )
+        
+        self.Power_transient = self.I_transient * self.R_load
+        
+        self.Vs_power = self.Vs_transient * self.I_transient
 
         
+    # # def get_error_transient(self, guess_array):
+    # #     """ get transient I error """
+
+    # def solve_transient_leg(self):
+    #     """ transient solution for one leg """
+
+    #     self.I_transient = np.zeros(self.t_array.size)
+    #     self.I_transient[:] = self.I
+    #     self.fsolve_output_transient = fsolve(self.get_error_transient, x0=self.I_transient)
+
     # def get_error_transient(self, guess_array):
-    #     """ get transient I error """
+    #     """get transient error in current"""
 
-    def solve_transient_leg(self):
-        """ transient solution for one leg """
+    #     self.solve_leg_transient_once()
 
-        self.I_transient = np.zeros(self.t_array.size)
-        self.I_transient[:] = self.I
-        self.fsolve_output_transient = fsolve(self.get_error_transient, x0=self.I_transient)
-
-    def get_error_transient(self, guess_array):
-        """get transient error in current"""
-
-        self.solve_leg_transient_once()
-
-        self.I_correct_transinet = (
-            self.Vs_transient / (self.R_load + self.R_internal_transient)
-            )
+    #     self.I_correct_transinet = (
+    #         self.Vs_transient / (self.R_load + self.R_internal_transient)
+    #         )
         
-        self.I_error_transient = (
-            self.I_transient - self.I_correct_transinet
-            )
+    #     self.I_error_transient = (
+    #         self.I_transient - self.I_correct_transinet
+    #         )
 
-    # ==================================================
-    # what is I_transient, might need to make a for loop
-    # ==================================================
+    #     return self.I_error_transient
 
 
 
 
 
 
-                
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# working code 4
+# Code runs 
+#===========================================
+#===========================================
+#===========================================
+# This is able to calculate Vs and R for transient
+# but not the error in current yet or power
+#===========================================
+#===========================================
+
+
+
+    # # def get_dTx_dt(self, T, t):
+    # def get_dTx_dt(self, TqVsR, t):
+
+    #     """Returns derivative of array of T wrt time.
+    #     """
+    #     # 3 for 3 terms - T_x, Vs_x, and R_x
+    #     TqVsR.shape = (3, self.nodes)
+
+    #     T = TqVsR[0,:]
+    #     # Vs_x = TqVsR[2,:]
+    #     # R_x = TqVsR[3,:]
+        
+    #     # ====================================
+    #     # Need to make a 1D array of current
+    #     # ====================================
+        
+    #     J = self.I/self.area
+
+    #     dT_dx = np.zeros(T.size)
+    #     q0 = np.zeros(T.size)
+    #     dq_dx_ss = np.zeros(T.size)
+    #     dq_dx = np.zeros(T.size)
+    #     dT_dt = np.zeros(T.size)
+    #     dR_dt = np.zeros(T.size)
+    #     dVs_dt = np.zeros(T.size)
+        
+    #     # This is dT_dx
+    #     dT_dx[1:-1] = 0.5 * (T[2:] - T[:-2]) / self.delta_x  
+    #     dT_dx[0] = (T[1] - T[0]) / self.delta_x
+    #     dT_dx[-1] = (T[-1] - T[-2]) / self.delta_x
+
+    #     for i in range(self.nodes):
+
+    #         T_props = T[i]  # i for central differencing
+    #         self.set_TEproperties(T_props)
+    #         self.set_ZT()
+
+    #         q0[i] = (
+    #             J * T[i] * self.alpha - self.k * dT_dx[i]
+    #             ) 
+    #         # dq_dx_ss based on old q0
+    #         dq_dx_ss[i] = (
+    #             (self.rho * J ** 2. * (1. + self.ZT)) - J *
+    #             self.alpha * q0[i] / self.k
+    #             )
+    #     # update q0
+    #     # hot side BC, q_h
+    #     q0[0] = self.U_hot * (self.T_h_conv - T[0]) 
+
+    #     # cold side BC, q_c 
+    #     q0[-1] = self.U_cold * (T[-1] - self.T_c_conv)
+
+    #     # this is dq_dx
+    #     dq_dx[1:-1] = (
+    #         (q0[2:] - q0[:-2]) / (2. * self.delta_x)
+    #         )
+    #     dq_dx[0] = (
+    #         (q0[1] - q0[0]) / self.delta_x
+    #         )
+    #     dq_dx[-1] = (
+    #         (q0[-1] - q0[-2]) / self.delta_x
+    #         )
+
+    #     for i in range(self.nodes):
+
+    #         T_props = T[i]  # i for central differencing
+    #         self.set_TEproperties(T_props)
+    #         self.set_ZT()
+
+    #         # this is dT_dt
+    #         dT_dt[i] = (
+    #             1. / self.C * (-dq_dx[i] + dq_dx_ss[i])
+    #             )
+
+    #         dVs_dt[i] = self.alpha * dT_dt[i]
+
+    #         dR_dt[i] = (
+    #             self.rho * self.delta_x / self.area * self.delta_t
+    #             )
+
+    #     self.return_array = (
+    #         np.array([dT_dt, dVs_dt, dR_dt]).flatten()
+    #         )
+    #     # print "\nreturn array is \n", self.return_array
+    #     return self.return_array
+
+    #     # return dT_dt
+
+    # def solve_leg_transient_once(self):
+
+    #     """Solves leg based on array of transient BC's."""
+
+    #     self.delta_x = self.x[1] - self.x[0]
+    #     self.delta_t = self.t_array[1] - self.t_array[0]
+    #     self.y0 = np.array([self.T_x, self.Vs_x, self.R_x]).flatten()
+
+    #     try: 
+    #         self.T_xt
+    #     # basically this command is being run, not the bottom one
+    #     except AttributeError:
+    #         self.odeint_output = odeint(
+    #             self.get_dTx_dt, y0=self.y0, t=self.t_array,
+    #             full_output=1 
+    #             )
+    #         self.T_xt = self.odeint_output[0]
+
+    #     # doesnt really get here
+    #     else:
+    #         self.y0 = self.T_xt[-1,:]
+    #         self.odeint_output = odeint(
+    #             self.get_dTx_dt, y0=self.y0, t=self.t_array,
+    #             full_output=1 
+    #             )
+    #         self.T_xt = np.concatenate((self.T_xt, self.odeint_output[0]))
+            
+    #     print "\nDid get through all the calculations without error \n"
+
+    #     self.Txt = self.T_xt[:, :self.nodes]
+    #     self.Vsxt = self.T_xt[:, self.nodes:2*self.nodes]
+    #     self.Rxt = self.T_xt[:, 2*self.nodes:]
+
+    #     self.R_internal_transient = self.Rxt[:,-1]        
+    #     self.Vs_transient = self.Vsxt[:,0] - self.Vsxt[:,-1]
+    #     # self.Vs_power = self.Vs_transient * self.I_transient
 
         
+    # # def get_error_transient(self, guess_array):
+    # #     """ get transient I error """
+
+    # def solve_transient_leg(self):
+    #     """ transient solution for one leg """
+
+    #     self.I_transient = np.zeros(self.t_array.size)
+    #     self.I_transient[:] = self.I
+    #     self.fsolve_output_transient = fsolve(self.get_error_transient, x0=self.I_transient)
+
+    # def get_error_transient(self, guess_array):
+    #     """get transient error in current"""
+
+    #     self.solve_leg_transient_once()
+
+    #     self.I_correct_transinet = (
+    #         self.Vs_transient / (self.R_load + self.R_internal_transient)
+    #         )
+        
+    #     self.I_error_transient = (
+    #         self.I_transient - self.I_correct_transinet
+    #         )
+
+    #     return self.I_error_transient
+
+        
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -920,7 +1155,8 @@ class Leg(object):
 
 
 
-
+# This is for steady state which I dont know works or nor, I do not
+# really use it since I mostly run te_pair and not a single leg
 
 
     def solve_leg_for_real(self):
