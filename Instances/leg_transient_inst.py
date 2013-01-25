@@ -50,13 +50,13 @@ plt.figure()
 
 for i in range(leg.t_array.size):
     j = i + leg.t_array.size
-    plt.plot(leg.x * 1e3, leg.Txt[i, :])
+    plt.plot(leg.x * 1e3, leg.Rxt[i, :])
     #plt.plot(leg.x * 1e3, leg.T_xt[j, :])
 
 plt.grid()
 plt.xlabel('Position (mm)')
 plt.ylabel('Temperature (K)')
-plt.ylim(leg.Txt.min() - 25., leg.Txt.max() + 25.)
+plt.ylim(leg.Rxt.min() - 25., leg.Rxt.max() + 25.)
 plt.xlim(-0.05, 0.40)
 plt.subplots_adjust(left=0.15)
 

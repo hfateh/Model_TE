@@ -183,26 +183,13 @@ class Leg(object):
 
 
 
-
     # def get_dTx_dt(self, T, t):
     def get_dTx_dt(self, TqVsR, t):
 
         """Returns derivative of array of T wrt time.
         """
-        # =============================================
-        # make sure that a 2D array T is being returned
-        # 2D array flattened into a very long 1D array
-        # need to divide this T by number of varables
-        # =============================================
-
-        # T is basically the same as y0
         # 3 for 3 terms - T_x, Vs_x, and R_x
         TqVsR.shape = (3, self.nodes)
-        # print "\nafter reshape, TqVsR looks like \n", TqVsR
-        
-        # ===========================================
-        # VERY IMPORTANT - all of TqVsR doesn't need to be used
-        # ===========================================
 
         T = TqVsR[0,:]
         # Vs_x = TqVsR[2,:]
@@ -261,21 +248,21 @@ class Leg(object):
             self.set_TEproperties(T_props)
             self.set_ZT()
 
-            dR_dt[i] = (
-                self.rho * self.delta_x / self.area * self.delta_t
-                )
-
-            dVs_dt[i] = - self.alpha * dT_dx[i]
-
             # this is dT_dt
             dT_dt[i] = (
                 1. / self.C * (-dq_dx[i] + dq_dx_ss[i])
                 )
 
+            dVs_dt[i] = self.alpha * dT_dt[i]
+
+            dR_dt[i] = (
+                self.rho * self.delta_x / self.area * self.delta_t
+                )
+
         self.return_array = (
             np.array([dT_dt, dVs_dt, dR_dt]).flatten()
             )
-        
+        # print "\nreturn array is \n", self.return_array
         return self.return_array
 
         # return dT_dt
@@ -287,9 +274,6 @@ class Leg(object):
         self.delta_x = self.x[1] - self.x[0]
         self.delta_t = self.t_array[1] - self.t_array[0]
         self.y0 = np.array([self.T_x, self.Vs_x, self.R_x]).flatten()
-        # print "\nAfter flatten, y0 reads like \n", self.y0
-
-        # self.y0 = self.T_x
 
         try: 
             self.T_xt
@@ -316,11 +300,64 @@ class Leg(object):
         self.Vsxt = self.T_xt[:, self.nodes:2*self.nodes]
         self.Rxt = self.T_xt[:, 2*self.nodes:]
 
+        self.R_internal_transient = self.Rxt[:,-1]        
+        self.Vs_transient = self.Vsxt[:,0] - self.Vsxt[:,-1]
+        # self.Vs_power = self.Vs_transient * self.I_transient
+
+        
+    # def get_error_transient(self, guess_array):
+    #     """ get transient I error """
+
+    def solve_transient_leg(self):
+        """ transient solution for one leg """
+
+        self.I_transient = np.zeros(self.t_array.size)
+        self.I_transient[:] = self.I
+        self.fsolve_output_transient = fsolve(self.get_error_transient, x0=self.I_transient)
+
+    def get_error_transient(self, guess_array):
+        """get transient error in current"""
+
+        self.solve_leg_transient_once()
+
+        self.I_correct_transinet = (
+            self.Vs_transient / (self.R_load + self.R_internal_transient)
+            )
+        
+        self.I_error_transient = (
+            self.I_transient - self.I_correct_transinet
+            )
+
+    # ==================================================
+    # what is I_transient, might need to make a for loop
+    # ==================================================
+
+
+
+
+
+
+                
 
 
 
 
         
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
