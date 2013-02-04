@@ -15,7 +15,7 @@ leg = leg.Leg()
 leg.length = 1.e-3
 # leg.I = 13.
 leg.material = 'HMS'
-leg.nodes = 50
+leg.nodes = 10
 leg.t_array = np.linspace(0, 1, 10)
 
 leg.T_h_conv = 400.

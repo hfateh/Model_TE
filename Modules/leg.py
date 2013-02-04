@@ -26,7 +26,7 @@ class Leg(object):
         self.Vs = 1.64/256.0
         self.R_internal = 1.0/256
 
-        self.material = 'HMS'
+        self.material = 'MgSi'
         self.T_h_conv = 443.
         self.T_c_conv = 323.
         self.U_hot = 54.e2
@@ -100,6 +100,9 @@ class Leg(object):
         self.V = self.R_load * self.I
         self.R_internal = self.R_x[-1]
 
+        # print "\nI is ", self.I
+        # print "\nq_x is found to be \n", self.q_x
+
         # Multiply q_h and q_c by area to get rid of this error
 
         # self.P = self.R_load * self.I ** 2
@@ -140,6 +143,9 @@ class Leg(object):
         dT_dx = (
             (J * self.alpha * T - q) / self.k
             )
+        
+        # print "\nJ is ", J
+        # print "\nalpha is ", self.alpha
         dq_dx = (
             (self.rho * J ** 2. * (1+self.ZT)) - (J * self.alpha * q /
             self.k)
@@ -161,7 +167,7 @@ class Leg(object):
 
         self.q_c = - (
             self.alpha * self.T_c * J - delta_T / self.length *
-        self.k - J ** 2 * self.length * self.rho
+            self.k - J ** 2 * self.length * self.rho
             )
 
         self.q_h = - (
@@ -292,6 +298,8 @@ class Leg(object):
         self.return_array = (
             np.array([dT_dt, dq_dt, dVs_dt, dR_dt]).flatten()
             )
+
+        print "\nreturn_array is \n", self.return_array
         # print "\nreturn array is \n", self.return_array
         return self.return_array
 

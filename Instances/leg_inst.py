@@ -12,6 +12,8 @@ reload(leg)
 
 leg = leg.Leg()
 
+leg.material = 'MgSi'
+
 # leg.length = 1.e-4
 # leg.material = 'HMS'
 # leg.nodes = 10 

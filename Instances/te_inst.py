@@ -23,7 +23,7 @@ te_pair.T_h_conv = 443.
 te_pair.U_cold = 800000.
 te_pair.U_hot = 20000.
 
-# te_pair.solve_te_pair()
+te_pair.solve_te_pair()
 
 
 
