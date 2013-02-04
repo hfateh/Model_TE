@@ -193,8 +193,8 @@ class Leg(object):
 
         """Returns derivative of array of T wrt time.
         """
-        # 3 for 3 terms - T_x, Vs_x, and R_x
-        TqVsR.shape = (3, self.nodes)
+        # 3 for 3 terms - T_x, q_x, Vs_x, and R_x
+        TqVsR.shape = (4, self.nodes)
 
         T = TqVsR[0,:]
         # Vs_x = TqVsR[2,:]
@@ -212,6 +212,7 @@ class Leg(object):
         q0 = np.zeros(T.size)
         dq_dx_ss = np.zeros(T.size)
         dq_dx = np.zeros(T.size)
+        dq_dt = np.zeros(T.size)
         dT_dt = np.zeros(T.size)
         dR_dt = np.zeros(T.size)
         dVs_dt = np.zeros(T.size)
@@ -253,32 +254,43 @@ class Leg(object):
             (q0[-1] - q0[-2]) / self.delta_x
             )
 
+        dT_dt[0] = (
+            1. / self.C * (-dq_dx[0] + dq_dx_ss[0])
+            )
+
         for i in range(self.nodes):
 
+            # need a delta_t here that changes every loop  so that log
+            # scale can be used
             T_props = T[i]  # i for central differencing
             self.set_TEproperties(T_props)
             self.set_ZT()
 
-            # this is dT_dt
+            # dq_dt[i] = (
+            #     ((self.I * self.alpha * dT_dt[i]) / self.area) -
+            #     (self.k/self.delta_x) * (dT_dt[i] - dT_dt[i-1])
+            #     )            
+
+            dq_dt[i] = (
+                ((self.I * self.alpha * dT_dt[i]) / self.area) -
+                (self.k/self.delta_x) * (dT_dt[i] - dT_dt[i-1])
+                )            
+
             dT_dt[i] = (
                 1. / self.C * (-dq_dx[i] + dq_dx_ss[i])
                 )
 
             dVs_dt[i] = self.alpha * dT_dt[i]
 
-            # 
-
-            # need a delta_t here that changes every loop  so that log
-            # scale can be used
-
-
-            # 
             dR_dt[i] = (
                 self.rho * self.delta_x / self.area * self.delta_t
                 )
 
+            # Why is the output q negative when I use the followin
+            # formula 
+
         self.return_array = (
-            np.array([dT_dt, dVs_dt, dR_dt]).flatten()
+            np.array([dT_dt, dq_dt, dVs_dt, dR_dt]).flatten()
             )
         # print "\nreturn array is \n", self.return_array
         return self.return_array
@@ -291,7 +303,7 @@ class Leg(object):
 
         self.delta_x = self.x[1] - self.x[0]
         self.delta_t = self.t_array[1] - self.t_array[0]
-        self.y0 = np.array([self.T_x, self.Vs_x, self.R_x]).flatten()
+        self.y0 = np.array([self.T_x, self.q_x, self.Vs_x, self.R_x]).flatten()
 
         try: 
             self.T_xt
@@ -315,8 +327,9 @@ class Leg(object):
         print "\nDid get through all the calculations without error \n"
 
         self.Txt = self.T_xt[:, :self.nodes]
-        self.Vsxt = self.T_xt[:, self.nodes:2*self.nodes]
-        self.Rxt = self.T_xt[:, 2*self.nodes:]
+        self.qxt = self.T_xt[:, self.nodes:2*self.nodes]
+        self.Vsxt = self.T_xt[:, 2*self.nodes:3*self.nodes]
+        self.Rxt = self.T_xt[:, 3*self.nodes:]
 
         self.R_internal_transient = self.Rxt[:,-1]        
         self.Vs_transient = self.Vsxt[:,0] - self.Vsxt[:,-1]
