@@ -27,9 +27,9 @@ class TE_Pair(object):
         self.Ntype.material = 'MgSi'
 
         self.nodes = 10
-        self.t_array = np.linspace(0., 2., 10)
-        self.T_h_conv = 443.
-        self.T_c_conv = 343.
+        self.t_array = np.linspace(0., 1., 10)
+        self.T_h_conv = 500.
+        self.T_c_conv = 300.
         self.U_hot = 54.e3
         self.U_cold = 253.e3
 
@@ -77,6 +77,9 @@ class TE_Pair(object):
         self.Ptype.R_internal = self.R_internal
         self.Ptype.t_array = self.t_array
         self.Ntype.t_array = self.t_array
+
+
+
         # self.Ptype.U_hot = self.U_hot
         # self.Ntype.U_hot = self.U_hot
         # self.Ptype.U_cold = self.U_cold
@@ -169,20 +172,33 @@ class TE_Pair(object):
         self.P = self.I * self.V
         self.P_total = self.P * self.pairs
 
-    
-
-
-
-
-
-
 
     def solve_te_pair_transient_once(self):
         """ """
+
+        print "\n"
+        print "\n"
+        print "\n"
+        print "Did it get here first ? \n"
+        print "\n"
+        print "\n"
+        print "\n"
+
+
         self.solve_te_pair()
         # Ntype temperature distribution is correct
+        print "\n"
+        print "\n"
+        print "\n"
+        print "Then, did it get here ? \n"
+        print "\n"
+        print "\n"
+        print "\n"
+
+        
         self.Ntype.solve_leg_transient_once()
         # Ptype distribution is showing wrong, why???
+
         self.Ptype.solve_leg_transient_once()
         
 

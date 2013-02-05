@@ -17,17 +17,25 @@ te_pair = te_pair.TE_Pair()
 te_pair.Ntype.material = 'MgSi'
 te_pair.Ptype.material = 'HMS'
 
-te_pair.T_c_conv = 323.
-te_pair.T_h_conv = 443.
+te_pair.T_c_conv = 300.
+te_pair.T_h_conv = 500.
 
-te_pair.U_cold = 800000.
-te_pair.U_hot = 20000.
+te_pair.U_cold = 800.
+te_pair.U_hot = 200.
 
+# # Have to increase both Ntype and Ptype T_h_conv
 te_pair.Ntype.T_h_conv += 300.
+te_pair.Ptype.T_h_conv += 300.
+
+# te_pair.solve_te_pair_transient_once()
 te_pair.solve_te_pair_transient_once()
 #leg.T_h_conv -= 300.
 #leg.T_c_conv += 15. 
 #leg.solve_leg_transient_once()
+
+
+
+
 
 # Plot configuration
 FONTSIZE = 14
@@ -48,14 +56,16 @@ plt.figure()
 # plt.plot(leg.t_array, leg.R_internal_transient)
 for i in range(te_pair.t_array.size):
     j = i + te_pair.t_array.size
-    plt.plot(te_pair.Ntype.x * 1e3, te_pair.Ntype.Txt[i, :])
+    plt.plot(te_pair.Ptype.x * 1e3, te_pair.Ptype.Txt[i, :])
     #plt.plot(leg.x * 1e3, leg.Rxt[i, :])
     #plt.plot(leg.x * 1e3, leg.T_xt[j, :])
 
 plt.grid()
 plt.xlabel('Position (mm)')
 plt.ylabel('Temperature (K)')
-plt.ylim(te_pair.Ntype.Txt.min() - 10., te_pair.Ntype.Txt.max() + 10.)
+plt.ylim(te_pair.Ptype.Txt.min() - 10., te_pair.Ptype.Txt.max() + 10.)
+#plt.ylim(te_pair.Ptype.Txt.min() - 10., te_pair.Ptype.Txt.max() + 10.)
+#plt.ylim(te_pair.Ptype.Txt.min() - 10., te_pair.Ptype.Txt.max() + 10.)
 plt.xlim(-0.05, 1.05)
 plt.subplots_adjust(left=0.15)
 

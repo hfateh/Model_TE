@@ -14,11 +14,18 @@ reload(leg)
 leg = leg.Leg()
 leg.length = 1.e-3
 # leg.I = 13.
-leg.material = 'HMS'
+
+
+# leg.material = 'HMS'
+# leg.Vs = 1.64/256.0
+leg.material = 'MgSi'
+leg.Vs = -1.64/256.0
+
+
 leg.nodes = 10
 leg.t_array = np.linspace(0, 1, 10)
 
-leg.T_h_conv = 400.
+leg.T_h_conv = 500.
 leg.U_hot = 54e3
 leg.T_c_conv = 300.
 leg.U_cold = 253e3
@@ -28,7 +35,7 @@ leg.set_constants()
 
 leg.solve_leg()
 
-leg.T_h_conv += 300.
+# leg.T_h_conv += 300.
 leg.solve_leg_transient_once()
 #leg.T_h_conv -= 300.
 #leg.T_c_conv += 15. 

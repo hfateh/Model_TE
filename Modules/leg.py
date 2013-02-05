@@ -26,9 +26,9 @@ class Leg(object):
         self.Vs = 1.64/256.0
         self.R_internal = 1.0/256
 
-        self.material = 'MgSi'
-        self.T_h_conv = 443.
-        self.T_c_conv = 323.
+        self.material = 'HMS'
+        self.T_h_conv = 500.
+        self.T_c_conv = 300.
         self.U_hot = 54.e2
         self.U_cold = 253.e3
         self.R_load = 1.0/256.0
@@ -286,12 +286,15 @@ class Leg(object):
                 1. / self.C * (-dq_dx[i] + dq_dx_ss[i])
                 )
 
+            # print "\ndT_dt is \n", dT_dt
             dVs_dt[i] = self.alpha * dT_dt[i]
 
             dR_dt[i] = (
                 self.rho * self.delta_x / self.area * self.delta_t
                 )
-
+            
+            # print "\ndq_dt is \n", dq_dt
+            
             # Why is the output q negative when I use the followin
             # formula 
 
@@ -299,7 +302,7 @@ class Leg(object):
             np.array([dT_dt, dq_dt, dVs_dt, dR_dt]).flatten()
             )
 
-        print "\nreturn_array is \n", self.return_array
+        # print "\nreturn_array is \n", self.return_array
         # print "\nreturn array is \n", self.return_array
         return self.return_array
 
