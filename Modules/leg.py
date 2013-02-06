@@ -260,9 +260,9 @@ class Leg(object):
             (q0[-1] - q0[-2]) / self.delta_x
             )
 
-        dT_dt[0] = (
-            1. / self.C * (-dq_dx[0] + dq_dx_ss[0])
-            )
+        # dT_dt[0] = (
+        #     1. / self.C * (-dq_dx[0] + dq_dx_ss[0])
+        #     )
 
         for i in range(self.nodes):
 
@@ -277,27 +277,50 @@ class Leg(object):
             #     (self.k/self.delta_x) * (dT_dt[i] - dT_dt[i-1])
             #     )            
 
-            dq_dt[i] = (
-                ((self.I * self.alpha * dT_dt[i]) / self.area) -
-                (self.k/self.delta_x) * (dT_dt[i] - dT_dt[i-1])
-                )            
-
             dT_dt[i] = (
                 1. / self.C * (-dq_dx[i] + dq_dx_ss[i])
                 )
-
-            # print "\ndT_dt is \n", dT_dt
+            
             dVs_dt[i] = self.alpha * dT_dt[i]
 
             dR_dt[i] = (
                 self.rho * self.delta_x / self.area * self.delta_t
                 )
-            
-            # print "\ndq_dt is \n", dq_dt
-            
-            # Why is the output q negative when I use the followin
-            # formula 
 
+#====================================================
+#====================================================
+#====================================================
+
+        # # for i in range(self.nodes):
+        # #     T_props = T[i]  # i for central differencing
+        # #     self.set_TEproperties(T_props)
+        # #     self.set_ZT()
+
+        # #     dq_dt[i] = (
+        # #         ((self.I * self.alpha * dT_dt[i]) / self.area) -
+        # #         (self.k/self.delta_x) * (dT_dt[i] - dT_dt[i-1])
+        # #         )
+
+        # dq_dt[1:-1] = (
+        #     ((self.I * self.alpha * dT_dt[2:]) / self.area) -
+        #     (self.k/(2*self.delta_x)) * (dT_dt[2:] - dT_dt[:-2])
+        #     )            
+        
+        # dq_dt[0] = (
+        #     ((self.I * self.alpha * dT_dt[1]) / self.area) -
+        #     (self.k/self.delta_x) * (dT_dt[1] - dT_dt[0])
+        #     )            
+
+        # dq_dt[-1] = (
+        #     ((self.I * self.alpha * dT_dt[-1]) / self.area) -
+        #     (self.k/self.delta_x) * (dT_dt[-2] - dT_dt[-1])
+        #     )            
+
+#====================================================
+#====================================================
+#====================================================
+
+            
         self.return_array = (
             np.array([dT_dt, dq_dt, dVs_dt, dR_dt]).flatten()
             )

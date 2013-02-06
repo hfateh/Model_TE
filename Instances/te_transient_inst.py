@@ -20,9 +20,11 @@ te_pair.Ptype.material = 'HMS'
 te_pair.T_c_conv = 300.
 te_pair.T_h_conv = 500.
 
-te_pair.U_cold = 800.
-te_pair.U_hot = 200.
+te_pair.U_cold = 800000000.
+te_pair.U_hot = 200000000.
 
+
+te_pair.solve_te_pair()
 # # Have to increase both Ntype and Ptype T_h_conv
 te_pair.Ntype.T_h_conv += 300.
 te_pair.Ptype.T_h_conv += 300.
@@ -56,14 +58,15 @@ plt.figure()
 # plt.plot(leg.t_array, leg.R_internal_transient)
 for i in range(te_pair.t_array.size):
     j = i + te_pair.t_array.size
-    plt.plot(te_pair.Ptype.x * 1e3, te_pair.Ptype.Txt[i, :])
+    plt.plot(te_pair.Ntype.x * 1e3, te_pair.Ntype.qxt[i, :])
+    plt.plot(te_pair.Ptype.x * 1e3, te_pair.Ptype.qxt[i, :])
     #plt.plot(leg.x * 1e3, leg.Rxt[i, :])
     #plt.plot(leg.x * 1e3, leg.T_xt[j, :])
 
 plt.grid()
 plt.xlabel('Position (mm)')
 plt.ylabel('Temperature (K)')
-plt.ylim(te_pair.Ptype.Txt.min() - 10., te_pair.Ptype.Txt.max() + 10.)
+plt.ylim(te_pair.Ntype.qxt.min() - 10., te_pair.Ntype.qxt.max() + 10.)
 #plt.ylim(te_pair.Ptype.Txt.min() - 10., te_pair.Ptype.Txt.max() + 10.)
 #plt.ylim(te_pair.Ptype.Txt.min() - 10., te_pair.Ptype.Txt.max() + 10.)
 plt.xlim(-0.05, 1.05)

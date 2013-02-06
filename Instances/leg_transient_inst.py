@@ -16,10 +16,10 @@ leg.length = 1.e-3
 # leg.I = 13.
 
 
-# leg.material = 'HMS'
-# leg.Vs = 1.64/256.0
-leg.material = 'MgSi'
-leg.Vs = -1.64/256.0
+leg.material = 'HMS'
+leg.Vs = 1.64/256.0
+# leg.material = 'MgSi'
+# leg.Vs = -1.64/256.0
 
 
 leg.nodes = 10

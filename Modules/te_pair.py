@@ -14,7 +14,7 @@ class TE_Pair(object):
         self.R_load_total = 1.0
         self.pairs = 128.0
         self.length = 1.e-3
-        self.leg_area_ratio = 0.8
+        self.leg_area_ratio = 1.
         self.fill_fraction = 0.3
         self.Vs = 1.64/256. 
         self.R_internal = 1./256.
@@ -172,38 +172,72 @@ class TE_Pair(object):
         self.P = self.I * self.V
         self.P_total = self.P * self.pairs
 
-
     def solve_te_pair_transient_once(self):
         """ """
-
-        print "\n"
-        print "\n"
-        print "\n"
-        print "Did it get here first ? \n"
-        print "\n"
-        print "\n"
-        print "\n"
-
-
-        self.solve_te_pair()
-        # Ntype temperature distribution is correct
-        print "\n"
-        print "\n"
-        print "\n"
-        print "Then, did it get here ? \n"
-        print "\n"
-        print "\n"
-        print "\n"
-
-        
         self.Ntype.solve_leg_transient_once()
-        # Ptype distribution is showing wrong, why???
-
         self.Ptype.solve_leg_transient_once()
+
+    # def get_error_transient(self, error_transient):
+    #     """ """
         
+    #     self.Ntype.I_transient = error_transient[:,0]
+    #     self.Ptype.I_transient = error_transient[:.1]
+    #     self.Ntype.T_h_xt = error_transient[:,2]
+    #     self.Ptype.T_h_xt = error_transient[:,3]
+
+    #     self.solve_te_pair_transient_once()
+
+    #     self.Ntype.T_c_xt = self.Ntype.Txt[:,-1]
+    #     self.Ptype.T_c_xt = self.Ptype.Txt[:,-1]
+
+    #     self.Ntype.T_h_xt = self.Ntype.Txt[:,0]
+    #     self.Ptype.T_h_xt = self.Ptype.Txt[:,0]
+
+    #     T_c_xt_error = (
+    #         self.Ntype.T_c_xt - self.Ptype.T_c_xt
+    #         )
+
+    #     T_h_xt_error = (
+    #         self.Ntype.T_h_xt - self.Ptype.T_h_xt
+    #         )
+        
+    #     I_error_transient = (
+    #         self.Ntype.I_transient - self.Ptype.I_transient
+    #         )
+        
+    #     self.transient_te_error = (
+    #         np.array([T_c_xt_error,T_h_xt_error,I_error_transient]).flatten()
+    #         )
+
+    #     return self.transient_te_error
+
+    # def solve_te_pair_transient(self):
+    #     """ """
+        
+    #     self.guess_transient = (np.array([]))
+        
+    #     self.fsolve_transient_output = (
+    #         fsolve(self.get_error_transient, x0=self.guess_transient)
+    #         )
+
+
+
+
+
 
 # Bunch of errors which I need to organize and find a way to equate
 # with respect to correct values
+
+
+
+
+
+
+
+
+
+
+
 
 
 

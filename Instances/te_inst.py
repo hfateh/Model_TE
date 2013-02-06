@@ -17,8 +17,8 @@ te_pair = te_pair.TE_Pair()
 te_pair.Ntype.material = 'MgSi'
 te_pair.Ptype.material = 'HMS'
 
-te_pair.T_c_conv = 323.
-te_pair.T_h_conv = 443.
+te_pair.T_c_conv = 300.
+te_pair.T_h_conv = 500.
 
 te_pair.U_cold = 800000.
 te_pair.U_hot = 20000.
