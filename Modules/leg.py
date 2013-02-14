@@ -43,8 +43,8 @@ class Leg(object):
         self.material = 'HMS'
         self.T_h_conv = 500.
         self.T_c_conv = 300.
-        self.U_hot = 54.e2
-        self.U_cold = 253.e3
+        self.U_hot = 500.
+        self.U_cold = 500.
         self.R_load = 1.0/256.0
         self.nodes = 10
         self.length = 1.5e-3
@@ -281,7 +281,7 @@ class Leg(object):
             dVs_dt[i] = self.alpha * dT_dt[i]
 
             dR_dt[i] = (
-                self.rho * self.delta_x / self.area * self.delta_t
+                self.rho * self.delta_x / (self.area * self.delta_t)
                 )
 
         self.return_array = (

@@ -20,8 +20,8 @@ te_pair.Ptype.material = 'HMS'
 te_pair.T_c_conv = 300.
 te_pair.T_h_conv = 500.
 
-te_pair.U_cold = 800000.
-te_pair.U_hot = 20000.
+te_pair.U_cold = 500.
+te_pair.U_hot = 500.
 
 te_pair.solve_te_pair()
 

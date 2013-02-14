@@ -30,8 +30,8 @@ class TE_Pair(object):
         self.t_array = np.linspace(0., 5., 20)
         self.T_h_conv = 500.
         self.T_c_conv = 300.
-        self.U_hot = 54.e3
-        self.U_cold = 253.e3
+        self.U_hot = 500.
+        self.U_cold = 500.
 
     def set_R_load(self):
         """ """
@@ -143,10 +143,11 @@ class TE_Pair(object):
             )
 
         T_c_error = self.Ntype.T_c - self.Ptype.T_c
+        # T_c_error = 0
         q_c_error = self.q_c - self.q_c_conv
-        q_c_error = 0.
+        #q_c_error = 0
         q_h_error = self.q_h - self.q_h_conv
-        q_h_error = 0.
+        #q_h_error = 0
         I_error = self.I_correct - self.I
 
         self.error = (
