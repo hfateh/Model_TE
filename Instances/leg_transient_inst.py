@@ -22,20 +22,22 @@ leg.Vs = 1.64/256.0
 # leg.Vs = -1.64/256.0
 
 
-leg.nodes = 10
-leg.t_array = np.linspace(0, 1, 10)
+leg.nodes = 100
+leg.t_array = np.linspace(0., 10., 200)
 
 leg.T_h_conv = 500.
-leg.U_hot = 54e3
+leg.U_hot = 54.e3
 leg.T_c_conv = 300.
-leg.U_cold = 253e3
+leg.U_cold = 253.e3
 
 #leg.t_array = np.logspace(np.log10(0.001), np.log10(1), 10)
 leg.set_constants()
 
 leg.solve_leg()
 
-# leg.T_h_conv += 300.
+#leg.T_h_conv += 300.
+#leg.solve_transient_leg()
+#leg.get_transient_leg_error()
 leg.solve_leg_transient_once()
 #leg.T_h_conv -= 300.
 #leg.T_c_conv += 15. 
@@ -60,14 +62,14 @@ plt.figure()
 # plt.plot(leg.t_array, leg.R_internal_transient)
 for i in range(leg.t_array.size):
     j = i + leg.t_array.size
-    plt.plot(leg.x * 1e3, leg.qxt[i, :])
+    plt.plot(leg.x * 1e3, leg.q[i, :])
     #plt.plot(leg.x * 1e3, leg.Rxt[i, :])
     #plt.plot(leg.x * 1e3, leg.T_xt[j, :])
 
 plt.grid()
 plt.xlabel('Position (mm)')
 plt.ylabel('Temperature (K)')
-plt.ylim(leg.qxt.min() - 0.10, leg.qxt.max() + 0.10)
+plt.ylim(leg.q.min() - 0.10, leg.q.max() + 0.10)
 plt.xlim(-0.05, 1.05)
 plt.subplots_adjust(left=0.15)
 

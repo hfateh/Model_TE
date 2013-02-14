@@ -26,8 +26,8 @@ class TE_Pair(object):
         self.Ptype.material = 'HMS'
         self.Ntype.material = 'MgSi'
 
-        self.nodes = 10
-        self.t_array = np.linspace(0., 1., 10)
+        self.nodes = 50
+        self.t_array = np.linspace(0., 5., 20)
         self.T_h_conv = 500.
         self.T_c_conv = 300.
         self.U_hot = 54.e3
@@ -144,7 +144,9 @@ class TE_Pair(object):
 
         T_c_error = self.Ntype.T_c - self.Ptype.T_c
         q_c_error = self.q_c - self.q_c_conv
+        q_c_error = 0.
         q_h_error = self.q_h - self.q_h_conv
+        q_h_error = 0.
         I_error = self.I_correct - self.I
 
         self.error = (
@@ -176,6 +178,69 @@ class TE_Pair(object):
         """ """
         self.Ntype.solve_leg_transient_once()
         self.Ptype.solve_leg_transient_once()
+
+        # CALCULATE EACH VARIABLE FOR THE PAIR
+        
+        self.Ntype.T_h_xt = self.Ntype.Txt[:,0]
+        self.Ptype.T_h_xt = self.Ptype.Txt[:,0]
+        self.Ntype.T_c_xt = self.Ntype.Txt[:,-1]
+        self.Ptype.T_c_xt = self.Ptype.Txt[:,-1]
+        
+        self.Vs_transient = (
+            - self.Ntype.Vs_transient + self.Ptype.Vs_transient
+            )
+        
+        self.R_internal_transient = (
+            self.Ntype.R_internal_transient +
+            self.Ptype.R_internal_transient
+            )
+
+        self.I_transient = (
+            self.Vs_transient / (self.R_load +
+            self.R_internal_transient)
+            )
+        
+        self.Power_transient = (
+            self.I_transient * self.R_load
+            )
+        
+        # Setting BCs for a new run of te_pair
+        # for a new run of transient solution
+        # self.Ntype.T_x = self.Ntype.Txt[-1,:]
+        # self.Ptype.T_x = self.Ptype.Txt[-1,:]
+        # self.Ntype.q_x = self.Ntype.qxt[-1,:]
+        # self.Ptype.q_x = self.Ptype.qxt[-1,:]
+        # self.Ntype.Vs_x = self.Ntype.Vsxt[-1,:]
+        # self.Ptype.Vs_x = self.Ptype.Vsxt[-1,:]
+        # self.Ntype.R_x = self.Ntype.Rxt[-1,:]
+        # self.Ptype.R_x = self.Ptype.Rxt[-1,:]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     # def get_error_transient(self, error_transient):
     #     """ """
@@ -227,6 +292,22 @@ class TE_Pair(object):
 
 # Bunch of errors which I need to organize and find a way to equate
 # with respect to correct values
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
