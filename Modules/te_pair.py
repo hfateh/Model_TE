@@ -15,7 +15,7 @@ class TE_Pair(object):
         self.pairs = 128.0
         self.length = 1.e-3
         self.leg_area_ratio = 1.
-        self.fill_fraction = 0.3
+        self.fill_fraction = .3
         self.Vs = 1.64/256. 
         self.R_internal = 1./256.
         self.Vs = 1.64/256.

@@ -14,8 +14,8 @@ reload(te_pair)
 
 te_pair = te_pair.TE_Pair()
 
-te_pair.nodes = 20
-te_pair.t_array = np.linspace(0., 5., 10)
+te_pair.nodes = 50
+te_pair.t_array = np.linspace(0., 5., 100)
 
 te_pair.Ntype.material = 'MgSi'
 te_pair.Ptype.material = 'HMS'

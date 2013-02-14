@@ -22,7 +22,7 @@ leg.Vs = 1.64/256.0
 # leg.Vs = -1.64/256.0
 
 
-leg.nodes = 100
+leg.nodes = 50
 leg.t_array = np.linspace(0., 10., 200)
 
 leg.T_h_conv = 500.
