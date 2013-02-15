@@ -6,10 +6,6 @@
 #===========================================
 #===========================================
 
-
-
-
-
 import types
 import numpy as np
 from scipy.integrate import odeint
@@ -122,8 +118,8 @@ class Leg(object):
         self.I_correct = (
             self.Vs / (self.R_load + self.R_internal)
             )
-        print "\nI in this run is", self.I
-        print "I_correct in this run is", self.I_correct
+        #print "\nI in this run is", self.I
+        #print "I_correct in this run is", self.I_correct
 
         # print "\nI is ", self.I
         # print "\nq_x is found to be \n", self.q_x
@@ -234,7 +230,6 @@ class Leg(object):
         J = self.I / self.area
         
         dT_dx = np.zeros(T.size)
-        #q0 = np.zeros(T.size)
         dq_dx_ss = np.zeros(T.size)
         dq_dx = np.zeros(T.size)
         dq_dt = np.zeros(T.size)
@@ -261,15 +256,11 @@ class Leg(object):
                 self.alpha * q0[i] / self.k
                 )
 
-        print "\nq0 hot is ", q0[0]
-        # update q0
-        # hot side BC, q_h
+        #print "\nq0 hot is ", q0[0]
         q0[0] = self.U_hot * (self.T_h_conv - T[0]) 
-        print "\nNow q0 hot is ", q0[0], "\n"
-        # cold side BC, q_c 
+        #print "\nNow q0 hot is ", q0[0], "\n"
         q0[-1] = self.U_cold * (T[-1] - self.T_c_conv)
 
-        # this is dq_dx
         dq_dx[1:-1] = (
             (q0[2:] - q0[:-2]) / (2. * self.delta_x)
             )
@@ -318,7 +309,7 @@ class Leg(object):
 
         try: 
             self.T_xt
-        # basically this command is being run, not the bottom one
+
         except AttributeError:
             self.odeint_output = odeint(
                 self.get_dTx_dt, y0=self.y0, t=self.t_array,
@@ -338,7 +329,8 @@ class Leg(object):
         print "\nDid get through all the calculations without error \n"
 
         self.Txt = self.T_xt[:, :self.nodes]
-        self.qxt = self.T_xt[:, self.nodes:2*self.nodes]
+        # Don't need this following line anymore
+        # self.qxt = self.T_xt[:, self.nodes:2*self.nodes]
         self.Vsxt = self.T_xt[:, 2*self.nodes:3*self.nodes]
         self.Rxt = self.T_xt[:, 3*self.nodes:]
 
@@ -349,9 +341,6 @@ class Leg(object):
             self.Vs_transient/(self.R_load +
                                self.R_internal_transient)
             )
-
-        self.q_h_xt = self.qxt[:,0]
-        self.q_c_xt = self.qxt[:,-1]
 
         dT_dx = np.zeros([self.t_array.size,self.nodes])
         dT_dx[:,0] = (
@@ -364,60 +353,21 @@ class Leg(object):
             (self.Txt[:,-1] - self.Txt[:,-2]) / self.delta_x
             )
         
-        self.q = np.zeros([self.t_array.size, self.nodes])
+        self.qxt = np.zeros([self.t_array.size, self.nodes])
         for i in range(self.t_array.size):
             T_props = self.Txt[i,0]  # i for central differencing
             self.set_TEproperties(T_props)            
-            J = self.I_transient[i]
-            self.q[i,0] = (
+            J = (self.I_transient[i]/self.area)
+            self.qxt[i,0] = (
                 J * self.Txt[i,0] * self.alpha - self.k * dT_dx[i,0]
                 )
-            self.q[i,-1] = (
+            self.qxt[i,-1] = (
                 J * self.Txt[i,-1] * self.alpha - self.k * dT_dx[i,-1]
                 )
-            self.q[i,1:-1] = (
+            self.qxt[i,1:-1] = (
                 J * self.Txt[i,1:-1] * self.alpha - self.k * dT_dx[i,1:-1]
                 )
 
-        # self.q_h_transient = self.q[:,0]
-        # self.q_c_transient = self.q[:,-1]
-
-        # self.q_h_transient_correct = (
-        #     self.U_hot * (self.T_h_conv - self.Txt[:,0])
-        #     )
-
-        # self.q_h_transient_correct = (
-        #     self.U_cold * (self.Txt[:,-1] - self.T_c_conv)
-        #     )
-        
-        # # self.T_x = self.Txt[self.t_array.size,:]
-        # # self.q_x = self.q[self.t_array.size,:]
-        # # self.Vs_x = self.Vsxt[self.t_array.size,:]
-        # # self.R_x = self.Rxt[self.t_array.size,:]
-
-
-
-
-
-
-
-
-# ======================================
-#        self.dT_dt[0,:] = 
-# ======================================        
-
-# LAYOUT OF THE PROCEDURE
-
-# solve_leg_transient()
-
-# solve_leg_transient_once()
-# fsolve(get_leg_transient_error, guess = )
-
-# get_leg_transient_error()
-# gets the guess
-# use the first line of guess as T
-# error is the error in hot side convection heat flux based on the new
-# temperature distribution that was calculated
 
 
 

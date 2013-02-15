@@ -78,16 +78,14 @@ class TE_Pair(object):
         self.Ptype.t_array = self.t_array
         self.Ntype.t_array = self.t_array
 
-
-
-        # self.Ptype.U_hot = self.U_hot
-        # self.Ntype.U_hot = self.U_hot
-        # self.Ptype.U_cold = self.U_cold
-        # self.Ntype.U_cold = self.U_cold
-        # self.Ptype.T_h_conv = self.T_h_conv
-        # self.Ntype.T_h_conv = self.T_h_conv
-        # self.Ptype.T_c_conv = self.T_c_conv
-        # self.Ntype.T_c_conv = self.T_c_conv
+        self.Ptype.U_hot = self.U_hot
+        self.Ntype.U_hot = self.U_hot
+        self.Ptype.U_cold = self.U_cold
+        self.Ntype.U_cold = self.U_cold
+        self.Ptype.T_h_conv = self.T_h_conv
+        self.Ntype.T_h_conv = self.T_h_conv
+        self.Ptype.T_c_conv = self.T_c_conv
+        self.Ntype.T_c_conv = self.T_c_conv
 
     def set_q_guess(self):
 
@@ -131,9 +129,6 @@ class TE_Pair(object):
         self.Ptype.I = self.I
         self.Ntype.I = -self.I
 
-        #self.Ptype.T_h = self.T_h
-        #self.Ntype.T_h = self.T_h
-
         self.solve_te_pair_once()
 
         self.Ntype.q_h_conv = (
@@ -149,12 +144,6 @@ class TE_Pair(object):
             self.U_cold * (self.Ptype.T_c - self.T_c_conv)
             )
 
-        #self.q_c_conv = self.U_cold * (self.T_c - self.T_c_conv)
-        #self.q_h_conv = self.U_hot * (self.T_h_conv - self.T_h)
-
-        #T_c_error = self.Ntype.T_c - self.Ptype.T_c
-        #T_c_error = self.Ntype.T_c - self.Ptype.T_c
-
         Nq_c_error = self.Ntype.q_c - self.Ntype.q_c_conv
         Pq_c_error = self.Ptype.q_c - self.Ptype.q_c_conv
         Nq_h_error = self.Ntype.q_h_conv - self.Ntype.q_h
@@ -164,7 +153,6 @@ class TE_Pair(object):
             self.Vs / (self.R_load + self.R_internal)
             )
 
-        #q_h_error = self.q_h - self.q_h_conv
         I_error = self.I_correct - self.I
 
         self.error = (
@@ -198,11 +186,6 @@ class TE_Pair(object):
         self.Ntype.solve_leg_transient_once()
         self.Ptype.solve_leg_transient_once()
         
-        self.Ntype.T_h_xt = self.Ntype.Txt[:,0]
-        self.Ptype.T_h_xt = self.Ptype.Txt[:,0]
-        self.Ntype.T_c_xt = self.Ntype.Txt[:,-1]
-        self.Ptype.T_c_xt = self.Ptype.Txt[:,-1]
-        
         self.Vs_transient = (
             - self.Ntype.Vs_transient + self.Ptype.Vs_transient
             )
@@ -221,69 +204,25 @@ class TE_Pair(object):
             self.I_transient * self.R_load
             )
         
-        # Setting BCs for a new run of te_pair
-        # for a new run of transient solution
-        # self.Ntype.T_x = self.Ntype.Txt[-1,:]
-        # self.Ptype.T_x = self.Ptype.Txt[-1,:]
-        # self.Ntype.q_x = self.Ntype.qxt[-1,:]
-        # self.Ptype.q_x = self.Ptype.qxt[-1,:]
-        # self.Ntype.Vs_x = self.Ntype.Vsxt[-1,:]
-        # self.Ptype.Vs_x = self.Ptype.Vsxt[-1,:]
-        # self.Ntype.R_x = self.Ntype.Rxt[-1,:]
-        # self.Ptype.R_x = self.Ptype.Rxt[-1,:]
+        self.q_c_transient = (
+            (self.Ntype.qxt[:,-1] * self.Ntype.area +
+            self.Ptype.qxt[:,-1] * self.Ptype.area) / self.area
+            )
 
-
-    # def get_error_transient(self, error_transient):
-    #     """ """
+        self.q_h_transient = (
+            (self.Ntype.qxt[:,0] * self.Ntype.area +
+            self.Ptype.qxt[:,0] * self.Ptype.area) / self.area
+            )
         
-    #     self.Ntype.I_transient = error_transient[:,0]
-    #     self.Ptype.I_transient = error_transient[:.1]
-    #     self.Ntype.T_h_xt = error_transient[:,2]
-    #     self.Ptype.T_h_xt = error_transient[:,3]
-
-    #     self.solve_te_pair_transient_once()
-
-    #     self.Ntype.T_c_xt = self.Ntype.Txt[:,-1]
-    #     self.Ptype.T_c_xt = self.Ptype.Txt[:,-1]
-
-    #     self.Ntype.T_h_xt = self.Ntype.Txt[:,0]
-    #     self.Ptype.T_h_xt = self.Ptype.Txt[:,0]
-
-    #     T_c_xt_error = (
-    #         self.Ntype.T_c_xt - self.Ptype.T_c_xt
-    #         )
-
-    #     T_h_xt_error = (
-    #         self.Ntype.T_h_xt - self.Ptype.T_h_xt
-    #         )
-        
-    #     I_error_transient = (
-    #         self.Ntype.I_transient - self.Ptype.I_transient
-    #         )
-        
-    #     self.transient_te_error = (
-    #         np.array([T_c_xt_error,T_h_xt_error,I_error_transient]).flatten()
-    #         )
-
-    #     return self.transient_te_error
-
-    # def solve_te_pair_transient(self):
-    #     """ """
-        
-    #     self.guess_transient = (np.array([]))
-        
-    #     self.fsolve_transient_output = (
-    #         fsolve(self.get_error_transient, x0=self.guess_transient)
-    #         )
-
-
-
-
-
-
-# Bunch of errors which I need to organize and find a way to equate
-# with respect to correct values
-
+        # set BCs for another run of te_transient_inst
+        self.Ntype.T_x = self.Ntype.Txt[-1,:]
+        self.Ptype.T_x = self.Ptype.Txt[-1,:]
+        self.Ntype.q_x = self.Ntype.qxt[-1,:]
+        self.Ptype.q_x = self.Ptype.qxt[-1,:]
+        self.Ntype.Vs_x = self.Ntype.Vsxt[-1,:]
+        self.Ptype.Vs_x = self.Ptype.Vsxt[-1,:]
+        self.Ntype.R_x = self.Ntype.Rxt[-1,:]
+        self.Ptype.R_x = self.Ptype.Rxt[-1,:]
 
 
 

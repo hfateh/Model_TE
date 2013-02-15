@@ -28,8 +28,8 @@ te_pair.U_hot = 500.
 
 te_pair.solve_te_pair()
 # # Have to increase both Ntype and Ptype T_h_conv
-#te_pair.Ntype.T_h_conv += 200.
-#te_pair.Ptype.T_h_conv += 200.
+te_pair.Ntype.T_h_conv += 20.
+te_pair.Ptype.T_h_conv += 20.
 
 print "This is over"
 
@@ -37,7 +37,7 @@ te_pair.solve_te_pair_transient_once()
 
 #==========================================
 #T_xn = te_pair.Ntype.q
-T_xn = te_pair.Ptype.Txt
+T_xn = te_pair.Ptype.qxt
 
 # te_pair.Ntype.T_h_conv -= 200.
 # te_pair.Ptype.T_h_conv -= 200.
