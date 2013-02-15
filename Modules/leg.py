@@ -32,8 +32,8 @@ class Leg(object):
         """ sets constants and binds methods
 
         """
-        # self.C = 1.e7
-        self.C = 10. * 1.e7
+        self.C = 1.e7
+        # self.C = 10. * 1.e7
 
         self.t_array = np.linspace(0., 5., 10)
 
@@ -205,26 +205,6 @@ class Leg(object):
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 # ===========================================
 # ===========================================
 # everything above this is steady state 
@@ -241,7 +221,7 @@ class Leg(object):
         TqVsR.shape = (4, self.nodes)
 
         T = TqVsR[0,:]
-        # q0 = TqVsR[1,:]
+        q0 = TqVsR[1,:]
         # Vs_x = TqVsR[2,:]
         # R_x = TqVsR[3,:]
         
@@ -254,7 +234,7 @@ class Leg(object):
         J = self.I / self.area
         
         dT_dx = np.zeros(T.size)
-        q0 = np.zeros(T.size)
+        #q0 = np.zeros(T.size)
         dq_dx_ss = np.zeros(T.size)
         dq_dx = np.zeros(T.size)
         dq_dt = np.zeros(T.size)
@@ -281,10 +261,11 @@ class Leg(object):
                 self.alpha * q0[i] / self.k
                 )
 
+        print "\nq0 hot is ", q0[0]
         # update q0
         # hot side BC, q_h
         q0[0] = self.U_hot * (self.T_h_conv - T[0]) 
-
+        print "\nNow q0 hot is ", q0[0], "\n"
         # cold side BC, q_c 
         q0[-1] = self.U_cold * (T[-1] - self.T_c_conv)
 
@@ -410,7 +391,6 @@ class Leg(object):
         # # self.q_x = self.q[self.t_array.size,:]
         # # self.Vs_x = self.Vsxt[self.t_array.size,:]
         # # self.R_x = self.Rxt[self.t_array.size,:]
-
 
 
 
