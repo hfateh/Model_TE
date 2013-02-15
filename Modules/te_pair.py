@@ -197,8 +197,6 @@ class TE_Pair(object):
         """ """
         self.Ntype.solve_leg_transient_once()
         self.Ptype.solve_leg_transient_once()
-
-        # CALCULATE EACH VARIABLE FOR THE PAIR
         
         self.Ntype.T_h_xt = self.Ntype.Txt[:,0]
         self.Ptype.T_h_xt = self.Ptype.Txt[:,0]
@@ -233,32 +231,6 @@ class TE_Pair(object):
         # self.Ptype.Vs_x = self.Ptype.Vsxt[-1,:]
         # self.Ntype.R_x = self.Ntype.Rxt[-1,:]
         # self.Ptype.R_x = self.Ptype.Rxt[-1,:]
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
     # def get_error_transient(self, error_transient):

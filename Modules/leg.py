@@ -295,8 +295,11 @@ class Leg(object):
             
             dVs_dt[i] = self.alpha * dT_dt[i]
 
+#============================
+#CHECK THIS FORMULA FOR dR_dt
+#============================
             dR_dt[i] = (
-                self.rho * self.delta_x / (self.area * self.delta_t)
+                self.rho * self.delta_x / self.area * self.delta_t
                 )
 
         self.return_array = (

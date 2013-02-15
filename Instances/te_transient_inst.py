@@ -37,7 +37,7 @@ te_pair.solve_te_pair_transient_once()
 
 #==========================================
 #T_xn = te_pair.Ntype.q
-T_xn = te_pair.Ntype.Txt
+T_xn = te_pair.Ptype.Txt
 
 # te_pair.Ntype.T_h_conv -= 200.
 # te_pair.Ptype.T_h_conv -= 200.
