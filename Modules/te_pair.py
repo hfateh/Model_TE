@@ -1,5 +1,6 @@
 import numpy as np
 from scipy.optimize import fsolve
+import time
 
 import leg
 reload(leg)
@@ -16,12 +17,15 @@ class TE_Pair(object):
         self.length = 1.e-3
         self.leg_area_ratio = 1.
         self.fill_fraction = .3
-        self.Vs = 1.64/256. 
         self.R_internal = 1./256.
         self.Vs = 1.64/256.
         
         self.Ptype = leg.Leg()
         self.Ntype = leg.Leg()
+
+        # All other void area, Ntype area, total te_pair area are
+        # calculated based on Ptype area
+        self.Ptype.area = (3.0e-3) ** 2 
 
         self.Ptype.material = 'HMS'
         self.Ntype.material = 'MgSi'
@@ -62,6 +66,7 @@ class TE_Pair(object):
     def set_constants(self):
 
         """ """
+        self.set_leg_areas()
         self.set_R_load()
         self.set_leg_areas()
         self.set_I()
@@ -180,9 +185,15 @@ class TE_Pair(object):
         self.V = self.I * self.R_load
         self.P = self.I * self.V
         self.P_total = self.P * self.pairs
+        self.P_flux = (self.P_total / self.area)
 
     def solve_te_pair_transient_once(self):
         """ """
+        self.Ntype.T_h_conv = self.T_h_conv
+        self.Ptype.T_h_conv = self.T_h_conv
+        self.Ntype.T_c_conv = self.T_c_conv
+        self.Ptype.T_c_conv = self.T_c_conv
+
         self.Ntype.solve_leg_transient_once()
         self.Ptype.solve_leg_transient_once()
         
@@ -203,7 +214,20 @@ class TE_Pair(object):
         self.Power_transient = (
             self.I_transient * self.R_load
             )
-        
+
+        self.Vs_transient_total = (
+            self.Vs_transient * self.pairs
+            )
+
+        # following code is just a check
+        self.Power_transient_total1 = (
+            self.I_transient * self.R_load_total
+            )
+
+        self.Power_transient_total = (
+            self.Power_transient * self.pairs
+            )
+
         self.q_c_transient = (
             (self.Ntype.qxt[:,-1] * self.Ntype.area +
             self.Ptype.qxt[:,-1] * self.Ptype.area) / self.area
@@ -226,6 +250,106 @@ class TE_Pair(object):
 
 
 
+
+#====================================================
+#OPTIMIZATION
+#====================================================
+#calling get_min_par should be able to vary the variables that wea
+#are trying to optimize.
+
+
+    def get_minpar(self, apar):
+
+        """Returns inverse of power flux.
+
+        Methods:
+
+        self.set_leg_areas
+
+        Used by method self.optimize
+
+        self.length = apar[0]
+        self.fill_fraction = apar[1]
+        self.I = apar[2]
+        self.leg_area_ratio = apar[3]
+
+        Use with scipy.optimize.fmin to find optimal set of input
+        parameters.
+
+        This method uses power flux rather than power because for
+        optimal power, leg height approaches zero and void area
+        approaches infinity.  This trivial result is not useful."""
+
+        self.opt_iter = self.opt_iter + 1
+        # if self.opt_iter % 15 == 0:
+        #     print "\noptimizaton iteration", self.opt_iter
+        #     print "leg length =", self.length, "m"
+        #     print "fill fraction =", self.fill_fraction * 100., "%"
+        #     print "current =", self.I, "A"
+        #     print "area ratio =", self.leg_area_ratio
+        #     print "power flux (kW/m^2)", self.P_flux
+        # # apar = np.array(apar)
+
+        self.R_load_total = apar[0]
+        self.fill_fraction = apar[1]
+        #self.fill_fraction = apar[1]
+        #self.I = apar[2]
+        #self.leg_area_ratio = apar[3]
+
+        # reset surrogate variables
+        self.set_constants()
+
+        self.solve_te_pair()
+
+        if (apar <= 0.).any():
+            minpar = np.abs(self.P_flux) ** 3. + 100
+            print "Encountered impossible value."
+
+        else:
+            minpar = - self.P_flux
+
+        return minpar
+
+    def optimize(self):
+
+        """Minimizes self.get_minpar
+
+        Methods:
+
+        self.get_minpar
+
+        self.x0 and self.xb must be defined elsewhere."""
+
+        time.clock()
+
+        # dummy function that might be used with minimization
+        def fprime():
+            return 1
+
+        self.opt_iter = 0
+
+        self.x0 = np.array([self.R_load_total, self.fill_fraction])
+
+        from scipy.optimize import fmin
+
+        self.xmin = fmin(self.get_minpar, self.x0)
+
+        t1 = time.clock()
+
+        print '\n'
+
+
+        # print "Optimized parameters:"
+        # print "leg length =", self.length, "m"
+        # print "fill fraction =", self.fill_fraction * 100., "%"
+        # print "current =", self.I, "A"
+        # print "area ratio =", self.leg_area_ratio
+
+        # print "\npower:", self.P * 1000., 'W'
+        # print "power flux:", self.P_total, "kW/m^2"
+        # print "Optimum length is", self.length
+        print "Optimum R_load_total is ", self.R_load_total
+        print """Elapsed time solving xmin1 =""", t1
 
 
 
