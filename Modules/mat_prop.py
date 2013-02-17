@@ -49,6 +49,26 @@ def import_raw_property_data(self):
             self.sigma_raw[:, 0], self.sigma_raw[:, 1], poly_deg
             )
 
+        self.density_raw = np.array([[283.888641142, 4786.],
+                              [396.056571319, 4786.],
+                              [573.510861948, 4786.],
+                              [786.035548194, 4786.],
+                              [856.520354208, 4786.],
+                              [901.20405173, 4786.]])
+        self.density_params = np.polyfit(
+            self.density_raw[:, 0], self.density_raw[:, 1], poly_deg
+            )
+
+        self.c_raw = np.array([[283.888641142,  582.85],
+                              [396.056571319,  582.85],
+                              [573.510861948,  582.85],
+                              [786.035548194,  582.85],
+                              [856.520354208,  582.85],
+                              [901.20405173,  582.85]])
+        self.c_params = np.polyfit(
+            self.c_raw[:, 0], self.c_raw[:, 1], poly_deg
+            )
+
     if self.material == "MgSi":
         # Raw data comes from Gao et al. MgSi is n-type
         poly_deg = 2
@@ -76,6 +96,25 @@ def import_raw_property_data(self):
         self.sigma_params = np.polyfit(self.sigma_raw[:, 0], self.sigma_raw[:, 1],
                               poly_deg)
 
+        self.density_raw = np.array([[283.888641142, 4786.],
+                              [396.056571319, 4786.],
+                              [573.510861948, 4786.],
+                              [786.035548194, 4786.],
+                              [856.520354208, 4786.],
+                              [901.20405173, 4786.]])
+        self.density_params = np.polyfit(
+            self.density_raw[:, 0], self.density_raw[:, 1], poly_deg
+            )
+
+        self.c_raw = np.array([[283.888641142, 582.85],
+                              [396.056571319,  582.85],
+                              [573.510861948,  582.85],
+                              [786.035548194,  582.85],
+                              [856.520354208,  582.85],
+                              [901.20405173,  582.85]])
+        self.c_params = np.polyfit(
+            self.c_raw[:, 0], self.c_raw[:, 1], poly_deg
+            )
 
 def set_properties_v_temp(self, T_props):
 
@@ -97,6 +136,15 @@ def set_properties_v_temp(self, T_props):
 
     # electrical resistivity (Ohm-m)
     self.rho = 1. / self.sigma
+
+    # density
+    self.density = np.polyval(self.density_params, T_props)
+
+    # specific heat
+    self.c = np.polyval(self.c_params, T_props)
+
+    # effective thermal mass, density times c (J/m3-K)
+    self.C = self.density * self.c
 
 def set_TEproperties(self, T_props):
 

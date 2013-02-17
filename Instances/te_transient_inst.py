@@ -32,7 +32,7 @@ te_pair.R_load_total = 1.0
 te_pair.length = 5.e-3
 
 # leg_area_ratio
-te_pair.leg_area_ratio = 1.
+te_pair.leg_area_ratio = .7
 
 # fill fraction
 te_pair.fill_fraction = 0.3
@@ -51,7 +51,7 @@ te_pair.U_hot = 500.
 # Steady state solution used as BS for transient
 te_pair.solve_te_pair()
 
-te_pair.optimize()
+# te_pair.optimize()
 
 # # Change in BC's
 # te_pair.T_h_conv += 20.

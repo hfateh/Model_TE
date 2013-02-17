@@ -28,7 +28,7 @@ class Leg(object):
         """ sets constants and binds methods
 
         """
-        self.C = 1.e7
+        # self.C = 1.e7
         # self.C = 10. * 1.e7
 
         self.t_array = np.linspace(0., 5., 10)
