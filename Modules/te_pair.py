@@ -65,6 +65,11 @@ class TE_Pair(object):
             self.Ntype.area + self.Ptype.area + self.area_void
             )
 
+    def set_t_array(self):
+        """only used when transient solutions are stacked"""
+        self.Ntype.t_array = self.t_array
+        self.Ptype.t_array = self.t_array
+
     def set_constants(self):
 
         """ """
@@ -250,6 +255,72 @@ class TE_Pair(object):
         self.Ntype.R_x = self.Ntype.Rxt[-1,:]
         self.Ptype.R_x = self.Ptype.Rxt[-1,:]
 
+
+# The results of this transient model are transient
+# Nodal temperature distribution
+# Nodal Seebeck voltage distribution
+# Nodal heat flux distribution
+# Nodal internal resistance distribution
+# Internal resistance
+# Current
+# Power
+# Hot side and cold side heat flux distribution
+
+# I need to  concatenate these for various runs
+    
+
+    # def solve_te_pair_transient(self):
+    #     """ """
+
+    #     try:
+    #         self.NTxt_array
+
+    #     except AttributeError:
+    #         self.NT_xt_array = self.Ntype.T_xt
+
+    #     else:
+    #         self.NT_xt_array = np.concatenate((self.Ntype.T_xt,            
+
+    #     try: 
+    #         self.T_xt
+
+    #     except AttributeError:
+    #         self.odeint_output = odeint(
+    #             self.get_dTx_dt, y0=self.y0, t=self.t_array,
+    #             full_output=1 
+    #             )
+    #         self.T_xt = self.odeint_output[0]
+
+    #     # doesnt really get here
+    #     # else:
+    #     #     self.y0 = self.T_xt[-1,:]
+    #     #     self.odeint_output = odeint(
+    #     #         self.get_dTx_dt, y0=self.y0, t=self.t_array,
+    #     #         full_output=1 
+    #     #         )
+    #     #     self.T_xt = np.concatenate((self.T_xt, self.odeint_output[0]))
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#====================================================
+#====================================================
 #Optimization works
 #====================================================
 #OPTIMIZATION
@@ -303,15 +374,15 @@ class TE_Pair(object):
         #     print "power flux (kW/m^2)", self.P_flux
         # # apar = np.array(apar)
 
-        #self.R_load_total = apar[0]
-        #self.leg_area_ratio = apar[0]
-        #self.length = apar[1]
-        #self.fill_fraction = apar[3]
         self.R_load_total = apar[0]
-        #self.fill_fraction = apar[1]
-        #self.I = apar[2]
         self.leg_area_ratio = apar[1]
         self.length = apar[2]
+        #self.fill_fraction = apar[3]
+        #self.R_load_total = apar[0]
+        #self.fill_fraction = apar[1]
+        #self.I = apar[2]
+        #self.leg_area_ratio = apar[1]
+        #self.fill_fraction = apar[0]
 
         # reset surrogate variables
         # self.set_constants()
@@ -348,7 +419,6 @@ class TE_Pair(object):
         self.x0 = (
             np.array([self.R_load_total, self.leg_area_ratio, self.length])
             )
-
 
         from scipy.optimize import fmin
 
