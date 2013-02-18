@@ -54,54 +54,54 @@ te_pair.solve_te_pair()
 # te_pair.optimize()
 
 # # Change in BC's
-# te_pair.T_h_conv += 20.
+te_pair.T_h_conv += 20.
 # te_pair.T_c_conv += 0.
 
 # # Transient te_pair solution
-# te_pair.solve_te_pair_transient_once()
+te_pair.solve_te_pair_transient_once()
 
 
-# #==========================================
-# #==========================================
-# # Plots
-# T_xn = te_pair.Ptype.qxt
+#==========================================
+#==========================================
+# Plots
+T_xn = te_pair.Ptype.Txt
 
-# # Plot configuration
-# FONTSIZE = 14
-# plt.rcParams['axes.labelsize'] = FONTSIZE
-# plt.rcParams['axes.titlesize'] = FONTSIZE
-# plt.rcParams['legend.fontsize'] = FONTSIZE
-# plt.rcParams['xtick.labelsize'] = FONTSIZE
-# plt.rcParams['ytick.labelsize'] = FONTSIZE
-# plt.rcParams['lines.linewidth'] = 1.5
-# plt.rcParams['lines.markersize'] = 10
+# Plot configuration
+FONTSIZE = 14
+plt.rcParams['axes.labelsize'] = FONTSIZE
+plt.rcParams['axes.titlesize'] = FONTSIZE
+plt.rcParams['legend.fontsize'] = FONTSIZE
+plt.rcParams['xtick.labelsize'] = FONTSIZE
+plt.rcParams['ytick.labelsize'] = FONTSIZE
+plt.rcParams['lines.linewidth'] = 1.5
+plt.rcParams['lines.markersize'] = 10
 
-# plt.close()
+plt.close()
 
-# plt.figure()
+plt.figure()
 
-# # plt.plot(leg.t_array, leg.I_transient)
-# # plt.plot(leg.t_array, leg.Power_transient)
-# # plt.plot(leg.t_array, leg.R_internal_transient)
-# for i in range(te_pair.t_array.size):
-#     #j = i + te_pair.t_array.size
-#     plt.plot(te_pair.Ntype.x * 1e3, T_xn[i, :])
-#     #plt.plot(te_pair.Ptype.x * 1e3, te_pair.Ptype.qxt[i, :])
-#     #plt.plot(leg.x * 1e3, leg.Rxt[i, :])
-#     #plt.plot(leg.x * 1e3, leg.T_xt[j, :])
+# plt.plot(leg.t_array, leg.I_transient)
+# plt.plot(leg.t_array, leg.Power_transient)
+# plt.plot(leg.t_array, leg.R_internal_transient)
+for i in range(te_pair.t_array.size):
+    #j = i + te_pair.t_array.size
+    plt.plot(te_pair.Ntype.x * 1e3, T_xn[i, :])
+    #plt.plot(te_pair.Ptype.x * 1e3, te_pair.Ptype.qxt[i, :])
+    #plt.plot(leg.x * 1e3, leg.Rxt[i, :])
+    #plt.plot(leg.x * 1e3, leg.T_xt[j, :])
 
-# plt.grid()
-# plt.xlabel('Position (mm)')
-# plt.ylabel('Temperature (K)')
-# #plt.ylim(T_xn.min() - 10., T_xn.max() + 10.)
-# #plt.ylim(te_pair.Ptype.Txt.min() - 10., te_pair.Ptype.Txt.max() + 10.)
-# #plt.ylim(te_pair.Ptype.Txt.min() - 10., te_pair.Ptype.Txt.max() + 10.)
-# #plt.xlim(-0.05, 1.05)
-# plt.subplots_adjust(left=0.15)
+plt.grid()
+plt.xlabel('Position (mm)')
+plt.ylabel('Temperature (K)')
+#plt.ylim(T_xn.min() - 10., T_xn.max() + 10.)
+#plt.ylim(te_pair.Ptype.Txt.min() - 10., te_pair.Ptype.Txt.max() + 10.)
+#plt.ylim(te_pair.Ptype.Txt.min() - 10., te_pair.Ptype.Txt.max() + 10.)
+#plt.xlim(-0.05, 1.05)
+plt.subplots_adjust(left=0.15)
 
-# #plt.savefig('../Plots/leg_instance/transient.pdf')
+#plt.savefig('../Plots/leg_instance/transient.pdf')
 
-# plt.show()
-# #=============================================
-# #=============================================
+plt.show()
+#=============================================
+#=============================================
 
