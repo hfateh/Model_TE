@@ -25,10 +25,10 @@ leg.Vs = 1.64/256.0
 leg.nodes = 50
 leg.t_array = np.linspace(0., 1., 200)
 
-leg.T_h_conv = 500.
-leg.U_hot = 500.
+leg.T_h_conv = 680.
+leg.U_hot = 2000.
 leg.T_c_conv = 300.
-leg.U_cold = 500.
+leg.U_cold = 8000.
 
 #leg.t_array = np.logspace(np.log10(0.001), np.log10(1), 10)
 leg.set_constants()

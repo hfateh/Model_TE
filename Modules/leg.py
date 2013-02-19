@@ -37,10 +37,10 @@ class Leg(object):
         self.R_internal = 1.0/256
 
         self.material = 'HMS'
-        self.T_h_conv = 500.
+        self.T_h_conv = 680.
         self.T_c_conv = 300.
-        self.U_hot = 500.
-        self.U_cold = 500.
+        self.U_hot = 2000.
+        self.U_cold = 8000.
         self.R_load = 1.0/256.0
         self.nodes = 10
         self.length = 1.5e-3

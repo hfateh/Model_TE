@@ -32,10 +32,10 @@ class TE_Pair(object):
 
         self.nodes = 50
         self.t_array = np.linspace(0., 5., 20)
-        self.T_h_conv = 500.
+        self.T_h_conv = 680.
         self.T_c_conv = 300.
-        self.U_hot = 500.
-        self.U_cold = 500.
+        self.U_hot = 2000.
+        self.U_cold = 8000.
 
     def set_R_load(self):
         """ """
@@ -333,10 +333,10 @@ class TE_Pair(object):
         self.optimize1()
         # self.optimize2()
 
-    def set_opt_constants(self):
-        """ """
-        self.set_leg_areas()
-        self.set_R_load()
+    # def set_opt_constants(self):
+    #     """ """
+    #     self.set_leg_areas()
+    #     self.set_R_load()
 
     def get_minpar1(self, apar):
 
@@ -385,8 +385,8 @@ class TE_Pair(object):
         #self.fill_fraction = apar[0]
 
         # reset surrogate variables
-        # self.set_constants()
-        self.set_opt_constants()
+        self.set_constants()
+        # self.set_opt_constants()
 
         self.solve_te_pair()
 
