@@ -190,8 +190,12 @@ class TE_Pair(object):
         self.fsolve_output = fsolve(self.get_error, x0=knob_arr0)
         self.V = self.I * self.R_load
         self.P = self.I * self.V
-        self.P_flux = self.P / self.area
-        self.P_total = self.P * self.pairs
+
+        self.R_ratio = (self.R_load / self.R_internal)
+
+        # This P_flux is in kW/m2
+        self.P_flux = (self.P / self.area) * 1.e-3
+        self.P_total = (self.P * self.pairs)
         # self.P_flux = (self.P_total / self.area)
 
     def solve_te_pair_transient_once(self):
